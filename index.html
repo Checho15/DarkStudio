@@ -89,23 +89,31 @@
                         <div class="card-footer">
                             <span class="read-more">Ver artículo completo →</span>
                             <div class="card-options">
-                                <i class="fas fa-share-alt" title="Compartir"></i>
                                 <i class="fas fa-bookmark" title="Guardar para después"></i>
                             </div>
                         </div>
                     </article>
                 </template>
+                
                 <div class="suggestion-box">
                     <h3>¿Tienes una duda común o sugerencia de artículo?</h3>
                     <p>Si no encuentras lo que buscas, cuéntanos qué tema o pregunta te gustaría ver respondido en nuestro blog.</p>
-                    <form>
-                        <input type="text" placeholder="Escribe tu pregunta o sugerencia aquí..." class="suggestion-input">
+                    
+                    <form id="suggestionForm">
+                        <input type="text" 
+                               id="suggestionInput" 
+                               placeholder="Escribe tu pregunta o sugerencia aquí..." 
+                               class="suggestion-input"
+                               required
+                               minlength="10">
                         <button type="submit" class="suggestion-button">Solicitar Artículo</button>
                     </form>
+                    
+                    <p id="suggestionMessage" class="note"></p>
+
                     <p class="note">Nota: Las sugerencias son revisadas por el equipo de administración.</p>
                 </div>
-
-            </div>
+                </div>
             
             <div id="article-view" class="content-section hidden-content article-mode">
                 <button id="backToBlog" class="back-button">
