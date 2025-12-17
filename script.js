@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     
     // ==========================================================
-    // 1. VARIABLES GLOBALES (Y ASUMIR QUE blogArticles EXISTE)
+    // 1. VARIABLES GLOBALES
     // ==========================================================
     const preloader = document.getElementById('preloader');
     const mainContent = document.getElementById('mainContent');
@@ -22,19 +22,28 @@ document.addEventListener('DOMContentLoaded', () => {
     const closeSidebarButton = document.getElementById('closeSidebar');
     const sidebar = document.getElementById('sidebar');
 
-    // Variables de NavegaciÛn y Blog
+    // Variables de Navegaci√≥n y Blog (CORREGIDO)
     const navLinks = document.querySelectorAll('.nav-link');
     const contentSections = document.querySelectorAll('.content-section');
     const homeContent = document.getElementById('home-content');
-    const blogContent = document.getElementById('blog-content'); 
-    const articleView = document.getElementById('article-view'); 
-    const backToBlogButton = document.getElementById('backToBlog'); 
+    const blogContent = document.getElementById('blog-content');  
+    const articleView = document.getElementById('article-view');  
+    const backToBlogButton = document.getElementById('backToBlog');  
     const blogGridContainer = document.getElementById('blogGridContainer');
 
-    // NUEVA VARIABLE: Template de la tarjeta del blog cargada desde index.html
+    // Template de la tarjeta del blog
     const blogCardTemplate = document.getElementById('blogCardTemplate');
 
-    // ?? NOTA: La variable 'blogArticles' se carga desde 'blog-data.js'
+    // >>> VARIABLES DEL FORMULARIO DE SUGERENCIAS <<<
+    const suggestionForm = document.getElementById('suggestionForm');
+    const suggestionInput = document.getElementById('suggestionInput');
+    const suggestionMessage = document.getElementById('suggestionMessage');  
+
+    // URL del servidor donde se ejecutar√° el Node.js/Bot (CORREGIDO)
+    // *** USAMOS LOCALHOST:3000 PARA PRUEBAS EN TU PC ***
+    const BOT_SERVER_URL = 'http://localhost:3000/sugerencia';  
+
+    // üí° NOTA: La variable 'blogArticles' se carga desde 'blog-data.js'
 
 
     // ==========================================================
@@ -42,7 +51,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // ==========================================================
 
     /**
-     * FunciÛn para manejar el formato simple:
+     * Funci√≥n para manejar el formato simple: (CORREGIDO)
      * - Reemplaza **Texto** con <b>Texto</b>
      */
     function parseContent(content) {
@@ -52,39 +61,31 @@ document.addEventListener('DOMContentLoaded', () => {
         return parsed;
     }
 
-    // FunciÛn para generar las tarjetas del blog a partir de los datos (blogArticles)
+    // Funci√≥n para generar las tarjetas del blog a partir de los datos (blogArticles) (CORREGIDO)
     function renderBlogCards() {
-        // ValidaciÛn para asegurar que los datos y el template est·n disponibles
         if (!blogGridContainer || typeof blogArticles === 'undefined' || !blogCardTemplate) {
-            console.error("Error: Elementos de blog esenciales no est·n disponibles.");
+            console.error("Error: Elementos de blog esenciales no est√°n disponibles."); // CORREGIDO
             return;
         }
         
-        // Limpiar el contenedor antes de empezar
         blogGridContainer.innerHTML = '';
         
         blogArticles.forEach(article => {
-            // Clonar el contenido del template (true = clonar todo el contenido interno)
             const cardClone = document.importNode(blogCardTemplate.content, true);
             const card = cardClone.querySelector('.blog-card');
             
-            // Inyectar datos variables en el clon
             card.setAttribute('data-article-id', article.id);
             card.querySelector('.card-title').innerHTML = `${article.icon} ${article.title}`;
             card.querySelector('.card-subtitle').textContent = article.subtitle;
             card.querySelector('.card-description').textContent = article.description_short;
             
-            // El mensaje "Ver artÌculo completo ?" ya est· dentro del template HTML.
-            
-            // AÒadir la tarjeta completa al contenedor
             blogGridContainer.appendChild(cardClone);
         });
         
-        // DespuÈs de renderizar, adjuntar los listeners
         attachBlogCardListeners();
     }
 
-    // Adjuntar los listeners de clic a las tarjetas reciÈn creadas
+    // Adjuntar los listeners de clic a las tarjetas reci√©n creadas (CORREGIDO)
     function attachBlogCardListeners() {
         document.querySelectorAll('.blog-card').forEach(card => {
             card.addEventListener('click', () => {
@@ -95,14 +96,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     // ==========================================================
-    // 3. L”GICA DEL PRELOADER
+    // 3. L√ìGICA DEL PRELOADER (CORREGIDO)
     // ==========================================================
     
     let progress = 0;
     const totalDuration = 3000;
     const intervalTime = 100;
     const totalSteps = totalDuration / intervalTime;
-    const increment = 100 / totalSteps; 
+    const increment = 100 / totalSteps;  
 
     const loadingInterval = setInterval(() => {
         progress += increment;
@@ -126,8 +127,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     renderBlogCards(); // <--- RENDERIZAR BLOG AL CARGAR
                     showCookieBannerIfNecessary();
                     
-                }, 1000); 
-            }, 100); 
+                }, 1000);  
+            }, 100);  
         }
     }, intervalTime);
 
@@ -153,26 +154,23 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!hasAccepted) {
             setTimeout(() => {
                 cookieBanner.classList.remove('hidden-cookie');
-            }, 500); 
+            }, 500);  
         }
     }
 
 
     // ==========================================================
-    // 5. L”GICA DE NAVEGACI”N Y BLOG
+    // 5. L√ìGICA DE NAVEGACI√ìN Y BLOG (CORREGIDO)
     // ==========================================================
 
     function showSection(targetId) {
-        // 1. Ocultar todas las secciones
         contentSections.forEach(section => {
             section.classList.remove('show-content');
             section.classList.add('hidden-content');
         });
         
-        // 2. Ocultamos la vista de artÌculo por si acaso
         articleView.classList.add('hidden-content');
 
-        // 3. Mostrar la secciÛn objetivo
         let targetSection = document.getElementById(targetId + '-content');
         if (targetSection) {
             targetSection.classList.remove('hidden-content');
@@ -182,31 +180,25 @@ document.addEventListener('DOMContentLoaded', () => {
             homeContent.classList.add('show-content');
         }
         
-        // 4. Volver al inicio de la p·gina para la nueva secciÛn
-        window.scrollTo(0, 0); 
+        window.scrollTo(0, 0);  
     }
 
-    // ABRIR ARTÕCULO
+    // ABRIR ART√çCULO (CORREGIDO)
     function openArticle(articleId) {
-        // Encontrar el objeto de artÌculo por su ID
         const articleData = blogArticles.find(a => a.id === articleId);
         if (!articleData) return;
 
-        // Ocultar el grid de blogs y mostrar la vista de artÌculo
         blogContent.classList.add('hidden-content');
         blogContent.classList.remove('show-content');
         
         articleView.classList.remove('hidden-content');
         articleView.classList.add('show-content');
 
-        // Inyectar el contenido, aplicando el parseo
-        document.getElementById('article-title').textContent = articleData.title; 
+        document.getElementById('article-title').textContent = articleData.title;  
         document.getElementById('article-subtitle').textContent = articleData.subtitle;
-        
-        // Usamos parseContent para reemplazar **negrita** antes de inyectar el HTML
         document.getElementById('article-body').innerHTML = parseContent(articleData.content);
         
-        window.scrollTo(0, 0); 
+        window.scrollTo(0, 0);  
     }
 
     // REGRESAR AL GRID DE BLOGS
@@ -216,33 +208,105 @@ document.addEventListener('DOMContentLoaded', () => {
         blogContent.classList.remove('hidden-content');
         blogContent.classList.add('show-content');
         
-        // Subir al inicio de la secciÛn del blog
         document.getElementById('blog-content').scrollIntoView();
     }
 
+
     // ==========================================================
-    // 6. LISTENERS DE EVENTOS (ActivaciÛn)
+    // 6. FUNCI√ìN REAL: MANEJAR ENV√çO DE SUGERENCIAS AL SERVIDOR BOT (CORREGIDO)
+    // ==========================================================
+    
+    async function sendSuggestionToDiscord(suggestionText) {
+        
+        try {
+            const response = await fetch(BOT_SERVER_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({  
+                    text: suggestionText
+                })
+            });
+
+            // Si el servidor Node.js no est√° corriendo, la funci√≥n fetch fallar√° antes de este punto (CORREGIDO)
+            const data = await response.json();
+            
+            return data.status === 'success';  
+
+        } catch (error) {
+            // Este catch es cr√≠tico si el servidor Node.js est√° apagado o hay un error de red (CORREGIDO)
+            console.error('Error de red/conexi√≥n con el servidor bot (¬øNode.js est√° corriendo?):', error);
+            return false;
+        }
+    }
+    
+    // Handler principal del formulario
+    async function handleSuggestionSubmit(e) {
+        e.preventDefault();
+        
+        const suggestionText = suggestionInput.value.trim();
+        suggestionMessage.textContent = '';  
+        
+        if (suggestionText.length < 10) {
+            // CORREGIDO: Tildes y s√≠mbolos
+            suggestionMessage.textContent = '‚ùå Por favor, escribe una sugerencia m√°s detallada (m√≠nimo 10 caracteres).';
+            suggestionMessage.style.color = '#e74c3c';
+            return;
+        }
+        
+        // Comprobaci√≥n r√°pida del servidor (no exhaustiva, pero √∫til para local) (CORREGIDO)
+        if (BOT_SERVER_URL.startsWith('http://localhost') && !suggestionInput.disabled) {
+            suggestionMessage.textContent = 'Verificando servidor local...';
+            suggestionMessage.style.color = '#f39c12';
+        }
+
+
+        suggestionInput.disabled = true;
+        suggestionForm.querySelector('button').disabled = true;
+        // CORREGIDO: Tildes
+        suggestionMessage.textContent = '... Enviando sugerencia. Por favor, espera...';
+        suggestionMessage.style.color = '#f39c12';
+        
+        const success = await sendSuggestionToDiscord(suggestionText);
+        
+        if (success) {
+            // CORREGIDO: Tildes y s√≠mbolos
+            suggestionMessage.textContent = '‚úÖ ¬°Sugerencia enviada con √©xito! Gracias por tu contribuci√≥n.';
+            suggestionMessage.style.color = '#2ecc71';
+            suggestionInput.value = '';  
+        } else {
+            // CORREGIDO: Tildes y s√≠mbolos
+            suggestionMessage.textContent = '‚ùå Error al enviar la sugerencia. Aseg√∫rate de que el bot est√© encendido en la terminal.';
+            suggestionMessage.style.color = '#e74c3c';
+        }
+        
+        suggestionInput.disabled = false;
+        suggestionForm.querySelector('button').disabled = false;
+    }
+
+
+    // ==========================================================
+    // 7. LISTENERS DE EVENTOS (Activaci√≥n) (CORREGIDO)
     // ==========================================================
 
-    // Listeners de Cookies/Modal
+    // Listeners de Cookies/Modal, Sidebar, Navegaci√≥n... (iguales) (CORREGIDO)
     acceptButtonBanner.addEventListener('click', saveAndHideCookieBanner);
     openModalButton.addEventListener('click', () => {
         termsModal.classList.remove('hidden-modal');
-        acceptButtonFinal.disabled = true; 
+        acceptButtonFinal.disabled = true;  
         termsScrollArea.scrollTop = 0;
     });
     closeModalButton.addEventListener('click', () => {
         termsModal.classList.add('hidden-modal');
     });
     termsScrollArea.addEventListener('scroll', () => {
-        // Habilitar el botÛn si el usuario ha hecho scroll hasta el final (o muy cerca)
-        if (termsScrollArea.scrollTop + termsScrollArea.clientHeight >= termsScrollArea.scrollHeight - 5) { 
+        if (termsScrollArea.scrollTop + termsScrollArea.clientHeight >= termsScrollArea.scrollHeight - 5) {  
             acceptButtonFinal.disabled = false;
-        } 
+        }  
     });
     acceptButtonFinal.addEventListener('click', saveAndHideCookieBanner);
 
-    // Listeners del Sidebar (Men˙ Hamburguesa)
     menuToggleButton.addEventListener('click', () => {
         sidebar.classList.remove('hidden-sidebar');
         setTimeout(() => {
@@ -253,10 +317,9 @@ document.addEventListener('DOMContentLoaded', () => {
         sidebar.classList.remove('show');
         setTimeout(() => {
             sidebar.classList.add('hidden-sidebar');
-        }, 400); 
+        }, 400);  
     });
 
-    // Listeners de NavegaciÛn (Enlaces del Men˙)
     navLinks.forEach(link => {
         link.addEventListener('click', (e) => {
             e.preventDefault();
@@ -264,13 +327,18 @@ document.addEventListener('DOMContentLoaded', () => {
             sidebar.classList.remove('show');
             setTimeout(() => {
                 sidebar.classList.add('hidden-sidebar');
-            }, 400); 
+            }, 400);  
 
-            const targetId = link.getAttribute('href').substring(1); 
+            const targetId = link.getAttribute('href').substring(1);  
             showSection(targetId);
         });
     });
 
-    // Listener para REGRESAR (BotÛn de flecha)
+    // Listener para el formulario de sugerencias
+    if (suggestionForm) {
+        suggestionForm.addEventListener('submit', handleSuggestionSubmit);
+    }
+
+    // Listener para REGRESAR (Bot√≥n de flecha) (CORREGIDO)
     backToBlogButton.addEventListener('click', backToBlogGrid);
 });
