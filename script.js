@@ -1,347 +1,389 @@
 document.addEventListener('DOMContentLoaded', () => {
     
-    // ==========================================================
-    // 1. VARIABLES GLOBALES
-    // ==========================================================
+    // ===================================================
+    // 1. GESTIÓN DEL PRELOADER
+    // ===================================================
+
     const preloader = document.getElementById('preloader');
     const mainContent = document.getElementById('mainContent');
     const progressBar = document.getElementById('progressBar');
+    const loadingText = document.querySelector('.loading-text');
 
-    // Variables de la Cookie/Modal
-    const cookieBanner = document.getElementById('cookieBanner');
-    const acceptButtonBanner = document.getElementById('acceptCookies');
-    const openModalButton = document.getElementById('openTermsModal');
-    const termsModal = document.getElementById('termsModal');
-    const closeModalButton = document.getElementById('closeModal');
-    const termsScrollArea = document.querySelector('.terms-scroll-area');
-    const acceptButtonFinal = document.getElementById('acceptTermsFinal');
-    const COOKIE_KEY = 'cookiesAccepted';
+    let loadProgress = 0;
+    const totalSteps = 100;
+    const intervalTime = 20; // ms
 
-    // Variables del Sidebar
-    const menuToggleButton = document.getElementById('menuToggle');
-    const closeSidebarButton = document.getElementById('closeSidebar');
+    const updateProgressBar = () => {
+        if (loadProgress < 95) {
+            loadProgress += 1;
+            progressBar.style.width = loadProgress + '%';
+            loadingText.textContent = `Cargando... ${loadProgress}%`;
+        } else if (loadProgress < 100) {
+            // Ralentizar la carga final para simular el final de la carga de recursos
+            loadProgress += 0.2;
+            progressBar.style.width = loadProgress + '%';
+            loadingText.textContent = `Cargando... ${Math.floor(loadProgress)}%`;
+        }
+        
+        if (loadProgress < 100) {
+            requestAnimationFrame(updateProgressBar);
+        }
+    };
+    
+    // Iniciar la animación de la barra de progreso
+    requestAnimationFrame(updateProgressBar);
+
+    window.addEventListener('load', () => {
+        // Asegurar que la barra llega al 100% justo antes de ocultar
+        loadProgress = 100;
+        progressBar.style.width = '100%';
+        loadingText.textContent = `Carga completa.`;
+
+        setTimeout(() => {
+            preloader.classList.add('fade-out');
+            
+            // Ocultar preloader y mostrar contenido principal
+            preloader.addEventListener('transitionend', () => {
+                preloader.classList.add('hidden');
+                mainContent.classList.remove('hidden');
+            }, { once: true });
+            
+        }, 500); // Pequeña pausa de 0.5s en el 100%
+    });
+
+    // ===================================================
+    // 2. NAVEGACIÓN Y SIDEBAR
+    // ===================================================
+    
     const sidebar = document.getElementById('sidebar');
-
-    // Variables de Navegación y Blog (CORREGIDO)
+    const menuToggle = document.getElementById('menuToggle');
+    const closeSidebar = document.getElementById('closeSidebar');
     const navLinks = document.querySelectorAll('.nav-link');
     const contentSections = document.querySelectorAll('.content-section');
-    const homeContent = document.getElementById('home-content');
-    const blogContent = document.getElementById('blog-content');  
-    const articleView = document.getElementById('article-view');  
-    const backToBlogButton = document.getElementById('backToBlog');  
-    const blogGridContainer = document.getElementById('blogGridContainer');
+    const blogContent = document.getElementById('blog-content');
+    const articleView = document.getElementById('article-view');
+    const backToBlogButton = document.getElementById('backToBlog');
 
-    // Template de la tarjeta del blog
-    const blogCardTemplate = document.getElementById('blogCardTemplate');
-
-    // >>> VARIABLES DEL FORMULARIO DE SUGERENCIAS <<<
-    const suggestionForm = document.getElementById('suggestionForm');
-    const suggestionInput = document.getElementById('suggestionInput');
-    const suggestionMessage = document.getElementById('suggestionMessage');  
-
-    // URL del servidor donde se ejecutará el Node.js/Bot (CORREGIDO)
-    // *** USAMOS LOCALHOST:3000 PARA PRUEBAS EN PC ***
-    const BOT_SERVER_URL = 'https://darkbots-production.up.railway.app/sugerencia';  
-
-    // 💡 NOTA: La variable 'blogArticles' se carga desde 'blog-data.js'
-
-
-    // ==========================================================
-    // 2. FUNCIONES DE RENDERING Y PARSEO
-    // ==========================================================
-
-    /**
-     * Función para manejar el formato simple: (CORREGIDO)
-     * - Reemplaza **Texto** con <b>Texto</b>
-     */
-    function parseContent(content) {
-        if (!content) return '';
-        // 1. Reemplaza **Texto** con <b>Texto</b>
-        let parsed = content.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
-        return parsed;
-    }
-
-    // Función para generar las tarjetas del blog a partir de los datos (blogArticles) (CORREGIDO)
-    function renderBlogCards() {
-        if (!blogGridContainer || typeof blogArticles === 'undefined' || !blogCardTemplate) {
-            console.error("Error: Elementos de blog esenciales no están disponibles."); // CORREGIDO
-            return;
-        }
-        
-        blogGridContainer.innerHTML = '';
-        
-        blogArticles.forEach(article => {
-            const cardClone = document.importNode(blogCardTemplate.content, true);
-            const card = cardClone.querySelector('.blog-card');
-            
-            card.setAttribute('data-article-id', article.id);
-            card.querySelector('.card-title').innerHTML = `${article.icon} ${article.title}`;
-            card.querySelector('.card-subtitle').textContent = article.subtitle;
-            card.querySelector('.card-description').textContent = article.description_short;
-            
-            blogGridContainer.appendChild(cardClone);
-        });
-        
-        attachBlogCardListeners();
-    }
-
-    // Adjuntar los listeners de clic a las tarjetas recién creadas (CORREGIDO)
-    function attachBlogCardListeners() {
-        document.querySelectorAll('.blog-card').forEach(card => {
-            card.addEventListener('click', () => {
-                const articleId = card.getAttribute('data-article-id');
-                openArticle(articleId);
-            });
-        });
-    }
-    
-    // ==========================================================
-    // 3. LÓGICA DEL PRELOADER (CORREGIDO)
-    // ==========================================================
-    
-    let progress = 0;
-    const totalDuration = 3000;
-    const intervalTime = 100;
-    const totalSteps = totalDuration / intervalTime;
-    const increment = 100 / totalSteps;  
-
-    const loadingInterval = setInterval(() => {
-        progress += increment;
-        
-        if (progress >= 100) {
-            progress = 100;
-        }
-        
-        progressBar.style.width = progress + '%';
-        
-        if (progress >= 100) {
-            clearInterval(loadingInterval);
-            
-            setTimeout(() => {
-                preloader.classList.add('fade-out');
-                
-                setTimeout(() => {
-                    preloader.style.display = 'none';
-                    mainContent.classList.remove('hidden');
-                    
-                    renderBlogCards(); // <--- RENDERIZAR BLOG AL CARGAR
-                    showCookieBannerIfNecessary();
-                    
-                }, 1000);  
-            }, 100);  
-        }
-    }, intervalTime);
-
-
-    // ==========================================================
-    // 4. FUNCIONES DE COOKIES/MODAL
-    // ==========================================================
-
-    function saveAndHideCookieBanner() {
-        localStorage.setItem(COOKIE_KEY, 'true');
-        
-        cookieBanner.style.opacity = '0';
-        setTimeout(() => {
-            cookieBanner.classList.add('hidden-cookie');
-        }, 500);
-
-        termsModal.classList.add('hidden-modal');
-    }
-
-    function showCookieBannerIfNecessary() {
-        const hasAccepted = localStorage.getItem(COOKIE_KEY);
-        
-        if (!hasAccepted) {
-            setTimeout(() => {
-                cookieBanner.classList.remove('hidden-cookie');
-            }, 500);  
-        }
-    }
-
-
-    // ==========================================================
-    // 5. LÓGICA DE NAVEGACIÓN Y BLOG (CORREGIDO)
-    // ==========================================================
-
-    function showSection(targetId) {
+    const showSection = (sectionId) => {
         contentSections.forEach(section => {
-            section.classList.remove('show-content');
             section.classList.add('hidden-content');
+            section.classList.remove('show-content');
         });
         
-        articleView.classList.add('hidden-content');
-
-        let targetSection = document.getElementById(targetId + '-content');
+        const targetSection = document.getElementById(sectionId);
         if (targetSection) {
             targetSection.classList.remove('hidden-content');
             targetSection.classList.add('show-content');
-        } else {
-            homeContent.classList.remove('hidden-content');
-            homeContent.classList.add('show-content');
         }
         
-        window.scrollTo(0, 0);  
-    }
-
-    // ABRIR ARTÍCULO (CORREGIDO)
-    function openArticle(articleId) {
-        const articleData = blogArticles.find(a => a.id === articleId);
-        if (!articleData) return;
-
-        blogContent.classList.add('hidden-content');
-        blogContent.classList.remove('show-content');
-        
-        articleView.classList.remove('hidden-content');
-        articleView.classList.add('show-content');
-
-        document.getElementById('article-title').textContent = articleData.title;  
-        document.getElementById('article-subtitle').textContent = articleData.subtitle;
-        document.getElementById('article-body').innerHTML = parseContent(articleData.content);
-        
-        window.scrollTo(0, 0);  
-    }
-
-    // REGRESAR AL GRID DE BLOGS
-    function backToBlogGrid() {
-        articleView.classList.add('hidden-content');
-        articleView.classList.remove('show-content');
-        blogContent.classList.remove('hidden-content');
-        blogContent.classList.add('show-content');
-        
-        document.getElementById('blog-content').scrollIntoView();
-    }
-
-
-    // ==========================================================
-    // 6. FUNCIÓN REAL: MANEJAR ENVÍO DE SUGERENCIAS AL SERVIDOR BOT (CORREGIDO)
-    // ==========================================================
-    
-    async function sendSuggestionToDiscord(suggestionText) {
-        
-        try {
-            const response = await fetch(BOT_SERVER_URL, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({  
-                    text: suggestionText
-                })
-            });
-
-            // Si el servidor Node.js no está corriendo, la función fetch fallará antes de este punto (CORREGIDO)
-            const data = await response.json();
-            
-            return data.status === 'success';  
-
-        } catch (error) {
-            // Este catch es crítico si el servidor Node.js está apagado o hay un error de red (CORREGIDO)
-            console.error('Error de red/conexión con el servidor bot (¿Node.js está corriendo?):', error);
-            return false;
+        // Si no estamos en el blog, ocultar vista de artículo
+        if (sectionId !== 'blog-content') {
+            articleView.classList.add('hidden-content');
+            blogContent.classList.remove('hidden-content'); // Asegurar que la grilla del blog esté visible si volvemos a ella.
         }
-    }
-    
-    // Handler principal del formulario
-    async function handleSuggestionSubmit(e) {
-        e.preventDefault();
-        
-        const suggestionText = suggestionInput.value.trim();
-        suggestionMessage.textContent = '';  
-        
-        if (suggestionText.length < 10) {
-            // CORREGIDO: Tildes y símbolos
-            suggestionMessage.textContent = '❌ Por favor, escribe una sugerencia más detallada (mínimo 10 caracteres).';
-            suggestionMessage.style.color = '#e74c3c';
-            return;
-        }
-        
-        // Comprobación rápida del servidor (no exhaustiva, pero útil para local) (CORREGIDO)
-        if (BOT_SERVER_URL.startsWith('http://localhost') && !suggestionInput.disabled) {
-            suggestionMessage.textContent = 'Verificando servidor local...';
-            suggestionMessage.style.color = '#f39c12';
-        }
+    };
 
-
-        suggestionInput.disabled = true;
-        suggestionForm.querySelector('button').disabled = true;
-        // CORREGIDO: Tildes
-        suggestionMessage.textContent = '... Enviando sugerencia. Por favor, espera...';
-        suggestionMessage.style.color = '#f39c12';
-        
-        const success = await sendSuggestionToDiscord(suggestionText);
-        
-        if (success) {
-            // CORREGIDO: Tildes y símbolos
-            suggestionMessage.textContent = '✅ ¡Sugerencia enviada con éxito! Gracias por tu contribución.';
-            suggestionMessage.style.color = '#2ecc71';
-            suggestionInput.value = '';  
-        } else {
-            // CORREGIDO: Tildes y símbolos
-            suggestionMessage.textContent = '❌ Error al enviar la sugerencia. Asegúrate de que el bot esté encendido en la terminal.';
-            suggestionMessage.style.color = '#e74c3c';
-        }
-        
-        suggestionInput.disabled = false;
-        suggestionForm.querySelector('button').disabled = false;
-    }
-
-
-    // ==========================================================
-    // 7. LISTENERS DE EVENTOS (Activación) (CORREGIDO)
-    // ==========================================================
-
-    // Listeners de Cookies/Modal, Sidebar, Navegación... (iguales) (CORREGIDO)
-    acceptButtonBanner.addEventListener('click', saveAndHideCookieBanner);
-    openModalButton.addEventListener('click', () => {
-        termsModal.classList.remove('hidden-modal');
-        acceptButtonFinal.disabled = true;  
-        termsScrollArea.scrollTop = 0;
-    });
-    closeModalButton.addEventListener('click', () => {
-        termsModal.classList.add('hidden-modal');
-    });
-    termsScrollArea.addEventListener('scroll', () => {
-        if (termsScrollArea.scrollTop + termsScrollArea.clientHeight >= termsScrollArea.scrollHeight - 5) {  
-            acceptButtonFinal.disabled = false;
-        }  
-    });
-    acceptButtonFinal.addEventListener('click', saveAndHideCookieBanner);
-
-    menuToggleButton.addEventListener('click', () => {
+    // Manejar la apertura/cierre del Sidebar
+    menuToggle.addEventListener('click', () => {
+        sidebar.classList.add('show');
         sidebar.classList.remove('hidden-sidebar');
-        setTimeout(() => {
-            sidebar.classList.add('show');
-        }, 10);
     });
-    closeSidebarButton.addEventListener('click', () => {
+
+    closeSidebar.addEventListener('click', () => {
         sidebar.classList.remove('show');
         setTimeout(() => {
             sidebar.classList.add('hidden-sidebar');
-        }, 400);  
+        }, 400); // Esperar a que termine la transición
     });
 
+    // Manejar la navegación por enlaces
     navLinks.forEach(link => {
         link.addEventListener('click', (e) => {
             e.preventDefault();
+            const targetId = e.currentTarget.getAttribute('href').substring(1) + '-content';
+            showSection(targetId);
             
+            // Cerrar sidebar tras navegar
             sidebar.classList.remove('show');
             setTimeout(() => {
                 sidebar.classList.add('hidden-sidebar');
-            }, 400);  
-
-            const targetId = link.getAttribute('href').substring(1);  
-            showSection(targetId);
+            }, 400); 
         });
     });
 
-    // Listener para el formulario de sugerencias
-    if (suggestionForm) {
-        suggestionForm.addEventListener('submit', handleSuggestionSubmit);
+    // Cargar la sección inicial
+    showSection('home-content'); 
+
+    // ===================================================
+    // 3. LÓGICA DEL BLOG Y VISTA DE ARTÍCULO
+    // ===================================================
+
+    const blogGridContainer = document.getElementById('blogGridContainer');
+    const blogCardTemplate = document.getElementById('blogCardTemplate');
+
+    if (typeof articles !== 'undefined' && blogGridContainer && blogCardTemplate) {
+        articles.forEach(article => {
+            const clone = blogCardTemplate.content.cloneNode(true);
+            const card = clone.querySelector('.blog-card');
+            
+            card.dataset.articleId = article.id;
+            clone.querySelector('.card-title').textContent = article.title;
+            clone.querySelector('.card-subtitle').textContent = article.subtitle;
+            clone.querySelector('.card-description').textContent = article.description;
+
+            card.addEventListener('click', () => {
+                displayArticle(article);
+            });
+
+            blogGridContainer.appendChild(clone);
+        });
     }
 
-    // Listener para REGRESAR (Botón de flecha) (CORREGIDO)
-    backToBlogButton.addEventListener('click', backToBlogGrid);
+    // Función para mostrar el contenido de un artículo
+    const displayArticle = (article) => {
+        document.getElementById('article-title').textContent = article.title;
+        document.getElementById('article-subtitle').textContent = article.subtitle;
+        document.getElementById('article-body').innerHTML = article.content;
+        
+        // Ocultar la grilla del blog y mostrar la vista de artículo
+        blogContent.classList.add('hidden-content');
+        articleView.classList.remove('hidden-content');
+        articleView.classList.add('show-content');
+        
+        // Scroll al inicio de la página
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    // Botón de regresar del artículo
+    backToBlogButton.addEventListener('click', () => {
+        articleView.classList.add('hidden-content');
+        blogContent.classList.remove('hidden-content');
+        blogContent.classList.add('show-content');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    // ===================================================
+    // 4. LÓGICA DE SUGERENCIAS (Requiere Login)
+    // ===================================================
+
+    const suggestionForm = document.getElementById('suggestionForm');
+    const suggestionInput = document.getElementById('suggestionInput');
+    const suggestionButton = suggestionForm.querySelector('.suggestion-button');
+    const suggestionMessage = document.getElementById('suggestionMessage');
+    const loginRequiredMessage = document.getElementById('loginRequiredMessage');
+
+    suggestionForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        
+        // Lógica de validación
+        if (!suggestionInput.value.trim() || suggestionInput.value.length < 10) {
+            suggestionMessage.textContent = "Error: La sugerencia debe tener al menos 10 caracteres.";
+            suggestionMessage.style.color = '#e74c3c';
+            return;
+        }
+
+        // Aquí iría el código para enviar la sugerencia al backend (AJAX/Fetch)
+        // Usaremos un mensaje de éxito simulado por ahora
+        const userEmail = localStorage.getItem('userEmail');
+        
+        suggestionMessage.textContent = `¡Sugerencia enviada! Gracias, ${userEmail || 'Usuario'}. La revisaremos pronto.`;
+        suggestionMessage.style.color = '#2ecc71';
+        suggestionInput.value = ''; // Limpiar el campo
+        
+        setTimeout(() => {
+            suggestionMessage.textContent = '';
+        }, 5000);
+    });
+    
+    // Función para actualizar el estado del formulario de sugerencias
+    const updateSuggestionFormState = (isLoggedIn) => {
+        if (isLoggedIn) {
+            suggestionInput.disabled = false;
+            suggestionButton.disabled = false;
+            loginRequiredMessage.style.display = 'none';
+        } else {
+            suggestionInput.disabled = true;
+            suggestionButton.disabled = true;
+            loginRequiredMessage.style.display = 'block';
+        }
+    };
+
+
+    // ===================================================
+    // 5. GESTIÓN DE SESIÓN DE GOOGLE
+    // ===================================================
+
+    const googleSignInButton = document.getElementById('googleSignInButton');
+    const userProfileContainer = document.getElementById('userProfile');
+    const profileImage = document.getElementById('profileImage');
+    const dropdownMenu = document.getElementById('dropdownMenu');
+    const dropdownName = document.getElementById('dropdownName');
+    const signOutButton = document.getElementById('signOutButton');
+
+    // Muestra/Oculta el menú desplegable del perfil
+    userProfileContainer.addEventListener('click', (e) => {
+        e.stopPropagation(); // Evita que el evento se propague al documento
+        dropdownMenu.classList.toggle('hidden');
+    });
+
+    // Cierra el menú cuando se hace clic fuera
+    document.addEventListener('click', (e) => {
+        if (!userProfileContainer.contains(e.target) && !dropdownMenu.contains(e.target)) {
+            dropdownMenu.classList.add('hidden');
+        }
+    });
+
+    // Lógica para cerrar sesión (Google y Local Storage)
+    signOutButton.addEventListener('click', () => {
+        // Cierre de sesión de Google (si se usa la librería)
+        if (typeof google !== 'undefined' && google.accounts.id) {
+            google.accounts.id.disableAutoSelect(); // Deshabilita el inicio de sesión automático
+            // Nota: El SDK de Google no tiene un método directo para "cerrar sesión" del token JWT,
+            // sino que se elimina la credencial guardada. Para cerrar sesión del lado del cliente,
+            // simplemente eliminamos la información de la sesión guardada localmente.
+        }
+
+        // Limpiar el estado de la sesión local
+        localStorage.removeItem('userName');
+        localStorage.removeItem('userEmail');
+        localStorage.removeItem('userPicture');
+
+        // Actualizar la UI
+        updateAuthUI(false);
+    });
+
+
+    // Función global llamada por el SDK de Google (debe estar en el scope global)
+    window.handleCredentialResponse = (response) => {
+        if (response.credential) {
+            // Decodificar el token JWT
+            const token = response.credential;
+            const payload = JSON.parse(atob(token.split('.')[1]));
+
+            // Guardar información relevante en Local Storage
+            localStorage.setItem('userName', payload.name);
+            localStorage.setItem('userEmail', payload.email);
+            localStorage.setItem('userPicture', payload.picture);
+            
+            // Actualizar la interfaz de usuario
+            updateAuthUI(true, payload.name, payload.picture);
+        }
+    };
+
+    // Función para actualizar la Interfaz de Usuario de Autenticación
+    const updateAuthUI = (isLoggedIn, name = '', picture = '') => {
+        if (isLoggedIn) {
+            // Mostrar perfil, ocultar botón de Google
+            googleSignInButton.style.display = 'none';
+            userProfileContainer.classList.remove('hidden-profile');
+            
+            // Usar los datos guardados en Local Storage si no se pasan como argumento
+            name = name || localStorage.getItem('userName');
+            picture = picture || localStorage.getItem('userPicture');
+            
+            profileImage.src = picture;
+            dropdownName.textContent = name;
+        } else {
+            // Ocultar perfil, mostrar botón de Google
+            googleSignInButton.style.display = 'block';
+            userProfileContainer.classList.add('hidden-profile');
+            
+            // Ocultar el dropdown si estaba abierto
+            dropdownMenu.classList.add('hidden');
+        }
+        
+        // Actualizar el estado de la sugerencia
+        updateSuggestionFormState(isLoggedIn);
+    };
+
+    // Verificar el estado de la sesión al cargar la página
+    const checkUserSession = () => {
+        const userName = localStorage.getItem('userName');
+        const userPicture = localStorage.getItem('userPicture');
+
+        if (userName && userPicture) {
+            updateAuthUI(true, userName, userPicture);
+        } else {
+            updateAuthUI(false);
+        }
+    };
+    
+    // ===================================================
+    // 6. LÓGICA DE COOKIES Y MODAL DE TÉRMINOS
+    // ===================================================
+
+    const cookieBanner = document.getElementById('cookieBanner');
+    const acceptCookiesButton = document.getElementById('acceptCookies');
+    const openTermsModalButton = document.getElementById('openTermsModal');
+    const termsModal = document.getElementById('termsModal');
+    const closeModalButton = document.getElementById('closeModal');
+    const acceptTermsFinalButton = document.getElementById('acceptTermsFinal');
+    const termsScrollArea = document.querySelector('.terms-scroll-area');
+
+    // 6.1. Funciones de Cookies
+    const setCookiePreference = (status) => {
+        localStorage.setItem('cookiesAccepted', status);
+        cookieBanner.classList.add('hidden-cookie');
+    };
+
+    const checkCookiePreference = () => {
+        const accepted = localStorage.getItem('cookiesAccepted');
+        if (accepted === 'true') {
+            // Cookies aceptadas, no mostrar nada
+            cookieBanner.classList.add('hidden-cookie');
+        } else {
+            // Mostrar banner si no ha sido aceptado
+            cookieBanner.classList.remove('hidden-cookie');
+        }
+    };
+
+    // 6.2. Funciones del Modal
+    const openModal = () => {
+        termsModal.classList.remove('hidden-modal');
+        // Resetear el scroll y deshabilitar el botón al abrir
+        termsScrollArea.scrollTop = 0;
+        acceptTermsFinalButton.disabled = true;
+    };
+
+    const closeModal = () => {
+        termsModal.classList.add('hidden-modal');
+    };
+
+    const checkScroll = () => {
+        // Habilitar el botón si el usuario ha scrollado casi hasta el final
+        const isScrolledToBottom = termsScrollArea.scrollTop + termsScrollArea.clientHeight >= termsScrollArea.scrollHeight - 20; // 20px de margen
+        acceptTermsFinalButton.disabled = !isScrolledToBottom;
+    };
+
+    // 6.3. Eventos de Cookies y Modal
+    acceptCookiesButton.addEventListener('click', () => {
+        setCookiePreference('true');
+    });
+
+    openTermsModalButton.addEventListener('click', openModal);
+
+    closeModalButton.addEventListener('click', closeModal);
+
+    termsScrollArea.addEventListener('scroll', checkScroll);
+
+    acceptTermsFinalButton.addEventListener('click', () => {
+        if (!acceptTermsFinalButton.disabled) {
+            setCookiePreference('true');
+            closeModal();
+        }
+    });
+
+    // Cierre del modal haciendo clic fuera
+    termsModal.addEventListener('click', (e) => {
+        if (e.target === termsModal) {
+            closeModal();
+        }
+    });
+    
+    // ===================================================
+    // 7. INICIALIZACIÓN
+    // ===================================================
+    
+    checkCookiePreference();
+    checkUserSession(); 
 });
-
-
-
