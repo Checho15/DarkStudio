@@ -33,7 +33,7 @@ const articles = [
         icon: '🗓️',
         title: 'Tipos de Eventos: La Innovación en Dark Studios',
         subtitle: 'Descubre las modalidades de juego que ofrecemos y nuestros proyectos destacados.',
-        isPinned: false,
+        isPinned: true,
         description: 'En Dark Studios, la variedad es clave. Creamos eventos innovadores para Minecraft Java, enfocados en experiencias inmersivas, destacando actualmente nuestro proyecto principal: Dark Games...',
         content: `
             <h2>¿Qué Tipos de Eventos Ofrecemos como Dark Studios?</h2>
@@ -82,3 +82,4 @@ const articles = [
         `
     }
 ];
+
