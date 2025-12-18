@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dark Studio - Inicio</title>
     
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
@@ -34,7 +36,35 @@
             </div>
             
             <div class="header-right">
+                <div id="g_id_onload"
+                    data-client_id="TU_CLIENT_ID_DE_GOOGLE"
+                    data-context="signin"
+                    data-ux_mode="popup"
+                    data-callback="handleCredentialResponse"
+                    data-auto_prompt="false">
                 </div>
+                
+                <div class="g_id_signin"
+                    data-type="icon"
+                    data-shape="circle"
+                    data-theme="outline"
+                    data-text="signin_with"
+                    data-size="large"
+                    data-locale="es"
+                    id="googleSignInButton">
+                </div>
+
+                <div id="userProfile" class="profile-dropdown hidden-profile">
+                    <img id="profileImage" src="" alt="Foto de Perfil" class="profile-image">
+                    
+                    <div id="dropdownMenu" class="dropdown-menu hidden">
+                        <p id="dropdownName" class="dropdown-name"></p>
+                        <button id="signOutButton" class="dropdown-item">
+                            <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                        </button>
+                    </div>
+                </div>
+            </div>
         </header>
 
         <nav id="sidebar" class="sidebar hidden-sidebar">
@@ -78,7 +108,7 @@
                 <p class="section-subtitle">Preguntas frecuentes y artículos detallados para resolver tus dudas.</p>
                 
                 <div class="blog-grid" id="blogGridContainer">
-                    </div>
+                </div>
                 
                 <template id="blogCardTemplate">
                     <article class="blog-card" data-article-id="">
@@ -96,6 +126,10 @@
                 </template>
                 
                 <div class="suggestion-box">
+                    <div id="loginRequiredMessage" class="login-required-message">
+                        <p><i class="fas fa-exclamation-triangle"></i> Debes iniciar sesión con Google para enviar sugerencias.</p>
+                    </div>
+                    
                     <h3>¿Tienes una duda común o sugerencia de artículo?</h3>
                     <p>Si no encuentras lo que buscas, cuéntanos qué tema o pregunta te gustaría ver respondido en nuestro blog.</p>
                     
@@ -105,15 +139,15 @@
                                placeholder="Escribe tu pregunta o sugerencia aquí..." 
                                class="suggestion-input"
                                required
-                               minlength="10">
-                        <button type="submit" class="suggestion-button">Solicitar Artículo</button>
+                               minlength="10"
+                               disabled> <button type="submit" class="suggestion-button" disabled>Solicitar Artículo</button>
                     </form>
                     
                     <p id="suggestionMessage" class="note"></p>
 
                     <p class="note">Nota: Las sugerencias son revisadas por el equipo de administración.</p>
                 </div>
-                </div>
+            </div>
             
             <div id="article-view" class="content-section hidden-content article-mode">
                 <button id="backToBlog" class="back-button">
@@ -124,7 +158,7 @@
                     <h1 id="article-title" class="full-article-title"></h1>
                     <p id="article-subtitle" class="full-article-subtitle"></p>
                     <div id="article-body" class="full-article-body">
-                        </div>
+                    </div>
                 </article>
             </div>
 
@@ -202,8 +236,8 @@
                 <ul>
                     <li>El spam y la publicidad externa no autorizada.</li>
                     <li>El uso de enlaces peligrosos o maliciosos.</li>
+                    <li>La administración puede revisar, modificar o eliminar contenido y revocar acceso si se incumplen las normas.</li>
                 </ul>
-                <p>La administración puede revisar, modificar o eliminar contenido y revocar acceso si se incumplen las normas.</p>
 
                 <h2>Registro y Control de Actividad</h2>
                 <p>Al permanecer en el servidor, aceptas que tu actividad puede registrarse para fines de seguridad y control. La edad mínima es **13 años** o la legal en tu país. Desconocer estas normas no exime de responsabilidades.</p>
