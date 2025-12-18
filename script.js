@@ -2,6 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // ===================================================
     // 1. GESTIÓN DEL PRELOADER (Ajustado para forzar los 3 segundos)
+    // ... (CÓDIGO DE PRELOADER OMITIDO POR BREVEDAD) ...
     // ===================================================
 
     const preloader = document.getElementById('preloader');
@@ -9,12 +10,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const progressBar = document.getElementById('progressBar');
     const loadingText = document.querySelector('.loading-text');
 
-    const MIN_LOAD_TIME = 3000; // Mínimo 3 segundos
-    const INTERVAL_MS = 50;     // Intervalo de actualización de la barra
+    const MIN_LOAD_TIME = 3000; 
+    const INTERVAL_MS = 50;     
     let isLoaded = false;
     let progress = 0;
 
-    // Simulación de progreso de carga (hasta el 90%)
     const progressInterval = setInterval(() => {
         if (progress < 90) {
             progress += 1; 
@@ -23,18 +23,15 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }, INTERVAL_MS);
 
-    // Función que se llama cuando el tiempo mínimo ha pasado
     const finishLoading = () => {
-        if (isLoaded) return; // Evitar llamadas dobles
+        if (isLoaded) return; 
 
         isLoaded = true;
         clearInterval(progressInterval);
         
-        // Completar la barra de progreso
         progressBar.style.width = '100%';
         loadingText.textContent = `Carga completa.`;
 
-        // Ocultar preloader con fade-out
         setTimeout(() => {
             preloader.classList.add('fade-out');
             
@@ -42,15 +39,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 preloader.classList.add('hidden');
                 mainContent.classList.remove('hidden');
                 
-                // Muestra la sección HOME después de la carga
                 showSection('home-content');
                 
             }, { once: true });
             
-        }, 500); // 0.5s de pausa final
+        }, 500); 
     };
 
-    // Forzar el tiempo mínimo de 3 segundos
     setTimeout(() => {
         finishLoading();
     }, MIN_LOAD_TIME);
@@ -58,6 +53,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ===================================================
     // 2. NAVEGACIÓN Y SIDEBAR
+    // ... (CÓDIGO DE NAVEGACIÓN OMITIDO POR BREVEDAD) ...
     // ===================================================
     
     const sidebar = document.getElementById('sidebar');
@@ -70,7 +66,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const backToBlogButton = document.getElementById('backToBlog');
     const serverLogo = document.getElementById('serverLogo'); 
 
-    // Función principal para mostrar/ocultar secciones de nivel superior
     const showSection = (sectionId) => {
         contentSections.forEach(section => {
             section.classList.add('hidden-content');
@@ -83,8 +78,6 @@ document.addEventListener('DOMContentLoaded', () => {
             targetSection.classList.add('show-content');
         }
         
-        // CORRECCIÓN CLAVE: Asegurar que el article-view siempre se oculte, 
-        // a menos que sea la sección de article-view (lo cual solo pasa al hacer clic en un artículo)
         if (sectionId !== 'article-view') { 
             articleView.classList.add('hidden-content');
             articleView.classList.remove('show-content');
@@ -98,7 +91,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 400); 
     };
     
-    // Manejar la apertura/cierre del Sidebar
     menuToggle.addEventListener('click', () => {
         sidebar.classList.add('show');
         sidebar.classList.remove('hidden-sidebar');
@@ -106,13 +98,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     closeSidebar.addEventListener('click', closeSidebarPanel);
     
-    // Clic en el logo para ir al Home
     serverLogo.addEventListener('click', () => {
         showSection('home-content');
         closeSidebarPanel();
     });
 
-    // Manejar la navegación por enlaces
     navLinks.forEach(link => {
         link.addEventListener('click', (e) => {
             e.preventDefault();
@@ -121,17 +111,23 @@ document.addEventListener('DOMContentLoaded', () => {
             
             showSection(targetId);
             
-            // Cerrar sidebar tras navegar
             closeSidebarPanel();
         });
     });
 
     // ===================================================
-    // 3. LÓGICA DEL BLOG Y VISTA DE ARTÍCULO (CORREGIDA)
+    // 3. LÓGICA DEL BLOG Y VISTA DE ARTÍCULO 
     // ===================================================
 
     const blogGridContainer = document.getElementById('blogGridContainer');
     const blogCardTemplate = document.getElementById('blogCardTemplate');
+
+    // NUEVA FUNCIÓN: Convierte **texto** a <strong>texto</strong>
+    const formatArticleContent = (content) => {
+        // Expresión regular para encontrar **texto** y reemplazarlo con <strong>texto</strong>
+        return content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    };
+
 
     const loadBlogArticles = () => {
         if (typeof articles !== 'undefined' && blogGridContainer && blogCardTemplate) {
@@ -139,7 +135,6 @@ document.addEventListener('DOMContentLoaded', () => {
             
             let sortedArticles = [...articles];
             
-            // Lógica de ordenamiento: Los 'isPinned: true' van primero
             sortedArticles.sort((a, b) => {
                 if (a.isPinned && !b.isPinned) return -1;
                 if (!a.isPinned && b.isPinned) return 1;
@@ -153,7 +148,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 card.dataset.articleId = article.id;
                 
-                // Si está fijado, añadir un icono visual
                 if (article.isPinned) {
                     clone.querySelector('.card-title').innerHTML = `📌 ${article.title}`;
                 } else {
@@ -168,7 +162,6 @@ document.addEventListener('DOMContentLoaded', () => {
                                   : article.description;
                 clone.querySelector('.card-description').textContent = description;
 
-                // Evento de clic para mostrar el artículo completo
                 card.addEventListener('click', () => {
                     displayArticle(article);
                 });
@@ -182,9 +175,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const displayArticle = (article) => {
         document.getElementById('article-title').textContent = article.title;
         document.getElementById('article-subtitle').textContent = article.subtitle;
-        document.getElementById('article-body').innerHTML = article.content;
         
-        // Transición: Ocultar Blog y mostrar Artículo (Mutuamente excluyente)
+        // USO DE LA NUEVA FUNCIÓN DE FORMATO
+        const formattedContent = formatArticleContent(article.content);
+        document.getElementById('article-body').innerHTML = formattedContent;
+        
         blogContent.classList.remove('show-content');
         blogContent.classList.add('hidden-content'); 
 
@@ -196,7 +191,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Botón de regresar del artículo
     backToBlogButton.addEventListener('click', () => {
-        // Transición: Ocultar Artículo y mostrar Blog (Mutuamente excluyente)
         articleView.classList.remove('show-content');
         articleView.classList.add('hidden-content');
 
@@ -211,6 +205,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ===================================================
     // 4. LÓGICA DE SUGERENCIAS (Requiere Login)
+    // ... (CÓDIGO DE SUGERENCIAS OMITIDO POR BREVEDAD) ...
     // ===================================================
 
     const suggestionForm = document.getElementById('suggestionForm');
@@ -241,7 +236,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 5000);
     });
     
-    // Función para actualizar el estado del formulario de sugerencias
     const updateSuggestionFormState = (isLoggedIn) => {
         if (isLoggedIn) {
             suggestionInput.disabled = false;
@@ -257,6 +251,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ===================================================
     // 5. GESTIÓN DE SESIÓN DE GOOGLE
+    // ... (CÓDIGO DE GOOGLE OMITIDO POR BREVEDAD) ...
     // ===================================================
 
     const googleSignInButton = document.getElementById('googleSignInButton');
@@ -266,20 +261,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const dropdownName = document.getElementById('dropdownName');
     const signOutButton = document.getElementById('signOutButton');
 
-    // Muestra/Oculta el menú desplegable del perfil
     userProfileContainer.addEventListener('click', (e) => {
         e.stopPropagation(); 
         dropdownMenu.classList.toggle('hidden');
     });
 
-    // Cierra el menú cuando se hace clic fuera
     document.addEventListener('click', (e) => {
         if (!userProfileContainer.contains(e.target) && !dropdownMenu.contains(e.target)) {
             dropdownMenu.classList.add('hidden');
         }
     });
 
-    // Lógica para cerrar sesión (Google y Local Storage)
     signOutButton.addEventListener('click', () => {
         if (typeof google !== 'undefined' && google.accounts.id) {
             google.accounts.id.disableAutoSelect(); 
@@ -292,8 +284,6 @@ document.addEventListener('DOMContentLoaded', () => {
         updateAuthUI(false);
     });
 
-
-    // Función global llamada por el SDK de Google
     window.handleCredentialResponse = (response) => {
         if (response.credential) {
             const token = response.credential;
@@ -307,7 +297,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // Función para actualizar la Interfaz de Usuario de Autenticación
     const updateAuthUI = (isLoggedIn, name = '', picture = '') => {
         if (isLoggedIn) {
             googleSignInButton.style.display = 'none';
@@ -328,7 +317,6 @@ document.addEventListener('DOMContentLoaded', () => {
         updateSuggestionFormState(isLoggedIn);
     };
 
-    // Verificar el estado de la sesión al cargar la página
     const checkUserSession = () => {
         const userName = localStorage.getItem('userName');
         const userPicture = localStorage.getItem('userPicture');
@@ -342,6 +330,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // ===================================================
     // 6. LÓGICA DE COOKIES Y MODAL DE TÉRMINOS
+    // ... (CÓDIGO DE COOKIES OMITIDO POR BREVEDAD) ...
     // ===================================================
 
     const cookieBanner = document.getElementById('cookieBanner');
@@ -352,7 +341,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const acceptTermsFinalButton = document.getElementById('acceptTermsFinal');
     const termsScrollArea = document.querySelector('.terms-scroll-area');
 
-    // 6.1. Funciones de Cookies
     const setCookiePreference = (status) => {
         localStorage.setItem('cookiesAccepted', status);
         cookieBanner.classList.add('hidden-cookie');
@@ -367,7 +355,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // 6.2. Funciones del Modal
     const openModal = () => {
         termsModal.classList.remove('hidden-modal');
         termsScrollArea.scrollTop = 0;
@@ -379,12 +366,10 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const checkScroll = () => {
-        // Habilita el botón solo cuando se ha llegado al final del scroll
         const isScrolledToBottom = termsScrollArea.scrollTop + termsScrollArea.clientHeight >= termsScrollArea.scrollHeight - 20; 
         acceptTermsFinalButton.disabled = !isScrolledToBottom;
     };
 
-    // 6.3. Eventos de Cookies y Modal
     acceptCookiesButton.addEventListener('click', () => {
         setCookiePreference('true');
     });
