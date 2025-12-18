@@ -41,7 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // URL del servidor donde se ejecutará el Node.js/Bot (CORREGIDO)
     // *** USAMOS LOCALHOST:3000 PARA PRUEBAS EN PC ***
-    const BOT_SERVER_URL = 'darkbots-production.up.railway.app/sugerencia';  
+    const BOT_SERVER_URL = 'https://darkbots-production.up.railway.app/sugerencia';  
 
     // 💡 NOTA: La variable 'blogArticles' se carga desde 'blog-data.js'
 
@@ -342,5 +342,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // Listener para REGRESAR (Botón de flecha) (CORREGIDO)
     backToBlogButton.addEventListener('click', backToBlogGrid);
 });
+
 
 
