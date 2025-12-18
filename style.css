@@ -5,7 +5,6 @@ body {
     font-family: sans-serif;
     background-color: #000;
     color: white;
-    /* IMPORTANTE: Body debe permitir scroll */
     min-height: 100vh;
 }
 
@@ -103,9 +102,11 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0 20px;
+    padding: 0 20px; /* Padding general */
+    padding-right: 15px; /* Ajuste para evitar recorte de Google Button */
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
     z-index: 500; 
+    box-sizing: border-box; /* Importante para que el padding no añada ancho */
 }
 
 .header-left {
@@ -157,7 +158,9 @@ body {
 }
 
 .hidden-sidebar {
-    display: none; 
+    /* Mantenemos display: block en el CSS si usamos transform, 
+       pero el JS lo gestionará. Por ahora, lo dejamos listo para la transición. */
+    /* display: none; */ 
 }
 
 .sidebar-header {
@@ -170,6 +173,7 @@ body {
     display: flex;
     align-items: center;
     padding: 0 20px;
+    box-sizing: border-box; 
 }
 
 .sidebar-title {
@@ -227,8 +231,6 @@ body {
 /* -------------------------------------------------------------------- */
 
 #mainContent {
-    /* CORRECCIÓN DE SCROLL */
-    /* Ya no es fixed, el body maneja el scroll */
     position: relative; 
     width: 100%;
     min-height: 100vh;
@@ -239,7 +241,6 @@ body {
 }
 
 .page-content {
-    /* Permitir que el contenido crezca y empuje el footer */
     flex-grow: 1; 
     padding-top: 60px; 
     width: 100%;
@@ -273,7 +274,6 @@ body {
     padding-top: 80px; 
     box-sizing: border-box;
     text-align: center;
-    /* Flex-grow asegura que esta sección ocupe todo el espacio disponible antes del footer */
     flex-grow: 1; 
 }
 
@@ -387,9 +387,9 @@ body {
 /* -------------------------------------------------------------------- */
 
 .article-mode {
-    text-align: left; /* Alineación del texto para la lectura */
-    padding-top: 100px; /* Más espacio */
-    max-width: 900px; /* Ancho cómodo para lectura */
+    text-align: left; 
+    padding-top: 100px; 
+    max-width: 900px; 
     margin: auto;
 }
 
@@ -749,7 +749,7 @@ body {
 }
 
 .creator-credit {
-    font-size: 0.9em; /* Más grande para el reconocimiento */
+    font-size: 0.9em; 
     color: #444;
 }
 
@@ -759,11 +759,20 @@ body {
 
 /* Contenedores de sesión */
 .header-right {
-    position: relative; /* Necesario para el dropdown */
+    position: relative; 
     display: flex;
     align-items: center;
     gap: 15px; 
+    /* IMPORTANTE: Este margen ayuda a que el botón de Google no toque el borde derecho */
+    padding-right: 10px; 
 }
+
+.g_id_signin {
+    /* Ajuste para que el botón de Google se vea completo */
+    transform: scale(0.95); 
+    transform-origin: right center;
+}
+
 
 .hidden-profile {
     display: none !important;
@@ -780,6 +789,8 @@ body {
     padding: 5px; 
     border-radius: 50%;
     transition: background-color 0.2s;
+    /* Necesario para posicionar el dropdown correctamente */
+    margin-right: -10px; 
 }
 
 .profile-dropdown:hover {
@@ -857,6 +868,7 @@ body {
     border-left: 5px solid #f39c12; 
     margin-bottom: 20px;
     border-radius: 4px;
+    /* Por defecto se debe mostrar si el usuario no está logueado, lo gestiona JS */
     display: none; 
     text-align: left;
 }
