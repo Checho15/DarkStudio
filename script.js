@@ -11,7 +11,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const MIN_LOAD_TIME = 3000; // Mínimo 3 segundos
     const INTERVAL_MS = 50;     // Intervalo de actualización de la barra
-    const startLoadTime = Date.now();
     let isLoaded = false;
     let progress = 0;
 
@@ -83,8 +82,8 @@ document.addEventListener('DOMContentLoaded', () => {
             targetSection.classList.add('show-content');
         }
         
-        // Si no estamos en el blog, ocultar vista de artículo
-        if (sectionId !== 'blog-content') {
+        // Si no estamos en la sección del blog, ocultamos el contenedor de vista de artículo
+        if (sectionId !== 'blog-content' && sectionId !== 'article-view') {
             articleView.classList.add('hidden-content');
         }
     };
@@ -115,7 +114,6 @@ document.addEventListener('DOMContentLoaded', () => {
         link.addEventListener('click', (e) => {
             e.preventDefault();
             const href = e.currentTarget.getAttribute('href');
-            // Si es el enlace 'Home', usa la ID 'home-content'
             const targetId = (href === '#home') ? 'home-content' : href.substring(1) + '-content';
             
             showSection(targetId);
@@ -126,27 +124,22 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // ===================================================
-    // 3. LÓGICA DEL BLOG Y VISTA DE ARTÍCULO (CORREGIDO)
+    // 3. LÓGICA DEL BLOG Y VISTA DE ARTÍCULO (CORREGIDA)
     // ===================================================
 
     const blogGridContainer = document.getElementById('blogGridContainer');
     const blogCardTemplate = document.getElementById('blogCardTemplate');
 
     const loadBlogArticles = () => {
-        // CORRECCIÓN: Usar la variable 'articles' del archivo blog-data.js
         if (typeof articles !== 'undefined' && blogGridContainer && blogCardTemplate) {
             blogGridContainer.innerHTML = ''; 
             
-            // 1. Clonar el array para no modificar el original
             let sortedArticles = [...articles];
             
-            // 2. Lógica de ordenamiento: Los 'isPinned: true' van primero
+            // Lógica de ordenamiento: Los 'isPinned: true' van primero
             sortedArticles.sort((a, b) => {
-                // Si 'a' está fijado y 'b' no, 'a' va primero (-1)
                 if (a.isPinned && !b.isPinned) return -1;
-                // Si 'b' está fijado y 'a' no, 'b' va primero (1)
                 if (!a.isPinned && b.isPinned) return 1;
-                // Si ambos tienen el mismo estado (fijado/no fijado), mantener el orden original o por ID
                 return 0; 
             });
 
@@ -164,18 +157,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     clone.querySelector('.card-title').textContent = article.title;
                 }
                 
-                clone.querySelector('.card-subtitle').textContent = article.subtitle;
+                const icon = article.icon || '';
+                clone.querySelector('.card-subtitle').textContent = `${icon} ${article.subtitle}`;
                 
                 const description = article.description.length > 100 
                                   ? article.description.substring(0, 100) + '...'
                                   : article.description;
                 clone.querySelector('.card-description').textContent = description;
-                
-                // Agregar el ícono personalizado del artículo (ej. 🚀) al subtítulo si existe
-                const icon = article.icon || '';
-                clone.querySelector('.card-subtitle').textContent = `${icon} ${article.subtitle}`;
 
-
+                // Evento de clic para mostrar el artículo completo
                 card.addEventListener('click', () => {
                     displayArticle(article);
                 });
@@ -191,7 +181,10 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('article-subtitle').textContent = article.subtitle;
         document.getElementById('article-body').innerHTML = article.content;
         
-        blogContent.classList.add('hidden-content');
+        // CORRECCIÓN CLAVE: Asegurar que el blog se oculta y la vista de artículo se muestra
+        blogContent.classList.remove('show-content');
+        blogContent.classList.add('hidden-content'); 
+
         articleView.classList.remove('hidden-content');
         articleView.classList.add('show-content');
         
@@ -200,9 +193,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Botón de regresar del artículo
     backToBlogButton.addEventListener('click', () => {
+        // CORRECCIÓN CLAVE: Asegurar que la vista de artículo se oculta y el blog se muestra
+        articleView.classList.remove('show-content');
         articleView.classList.add('hidden-content');
+
         blogContent.classList.remove('hidden-content');
         blogContent.classList.add('show-content');
+        
         window.scrollTo({ top: 0, behavior: 'smooth' });
     });
     
