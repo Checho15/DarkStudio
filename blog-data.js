@@ -2,18 +2,21 @@
  * blog-data.js
  * * Este archivo contiene la estructura de datos para todos los artículos del blog.
  * Para añadir un nuevo artículo, simplemente agrega un nuevo objeto a este array.
- * * CONVENCIONES DE FORMATO:
+ * * PROPIEDADES NUEVAS:
+ * - isPinned: true si el artículo debe aparecer primero en la lista (fijado).
+ * * * CONVENCIONES DE FORMATO:
  * - Para poner texto en negrita dentro del 'content', usa **Texto**.
  * - El 'content' acepta etiquetas HTML básicas como <h2>, <p>, <ul> y <li>.
  */
 
-const blogArticles = [
+const articles = [
     {
         id: 'studio-mission',
         icon: '🚀',
         title: 'Dark Studios: ¿Qué somos? y ¿Qué hacemos?',
         subtitle: 'Conoce en que nos especializamos y el alcance de nuestra comunidad creativa.',
-        description_short: 'Dark Studios es un colectivo especializado en llevar las experiencias del videojuego de minecraft a nuevas espectativas. Fusionamos programación de vanguardia, un buen diseño y una comunidad activa para crear eventos memorables...',
+        isPinned: true, // ESTE ARTÍCULO ESTARÁ FIJADO ARRIBA
+        description: 'Dark Studios es un colectivo especializado en llevar las experiencias del videojuego de minecraft a nuevas espectativas. Fusionamos programación de vanguardia, un buen diseño y una comunidad activa para crear eventos memorables...',
         content: `
             <h2>¿Qué es Dark Studios y cuál es su Misión?</h2>
             <p>Dark Studios no es simplemente una comunidad; es un creador de **nuevas experiencias** donde la creatividad y la innovación no fallan. Nuestra misión principal es llevar las ideas de nuestros eventos al límite, creando contenidos interactivos y que cautivan a nuestros usuarios.</p>
@@ -30,7 +33,8 @@ const blogArticles = [
         icon: '🗓️',
         title: 'Tipos de Eventos: La Innovación en Dark Studios',
         subtitle: 'Descubre las modalidades de juego que ofrecemos y nuestros proyectos destacados.',
-        description_short: 'En Dark Studios, la variedad es clave. Creamos eventos innovadores para Minecraft Java, enfocados en experiencias inmersivas, destacando actualmente nuestro proyecto principal: Dark Games...',
+        isPinned: false,
+        description: 'En Dark Studios, la variedad es clave. Creamos eventos innovadores para Minecraft Java, enfocados en experiencias inmersivas, destacando actualmente nuestro proyecto principal: Dark Games...',
         content: `
             <h2>¿Qué Tipos de Eventos Ofrecemos como Dark Studios?</h2>
             <p>Nuestra programación semanal está diseñada para mantener a nuestra comunidad siempre activa y comprometida. Los eventos en Dark Studios se centran en ofrecer experiencias divertidas y altamente pulidas con la creación de **Eventos Varios**, exclusivas para Minecraft Java.</p>
@@ -44,7 +48,7 @@ const blogArticles = [
                 <li>Eventos de **Aventura** Inmersivos.</li>
                 <li>Batallas de **Creación** y Retos de Construcción.</li>
                 <li>Retos de **Supervivencia** Únicos.</li>
-				<li>Diversion y Variedad de **Minijuegos** Entretenidos.</li>
+                <li>Diversion y Variedad de **Minijuegos** Entretenidos.</li>
                 <li>Repetición de eventos comprados que han sido optimizados por nuestro equipo o de eventos propios.</li>
             </ul>
         `
@@ -54,7 +58,8 @@ const blogArticles = [
         icon: '📞',
         title: 'Soporte Directo: Nuestros Canales de Atención al Usuario',
         subtitle: 'Conoce los medios oficiales para obtener ayuda, reportar problemas o hacer sugerencias.',
-        description_short: 'Ofrecemos varios canales de soporte, incluyendo el sistema de tickets de Discord, correo electrónico especializado para reportes y foros de comunidad para preguntas generales...',
+        isPinned: false,
+        description: 'Ofrecemos varios canales de soporte, incluyendo el sistema de tickets de Discord, correo electrónico especializado para reportes y foros de comunidad para preguntas generales...',
         content: `
             <h2>Cómo Contactar a Nuestro Equipo</h2>
             <p>Para asegurar una respuesta rápida y organizada, ofrecemos diferentes canales según el tipo de necesidad:</p>
@@ -72,7 +77,7 @@ const blogArticles = [
             <ul>
                 <li>**Correo Electrónico:** Para diferentes temas de ayuda, patrocinios, o recomendaciones, pero principalmente recomendamos **Discord**.</li>
                 <li>**Canal de Dudas-Publicas en DISCORD:** Para preguntas generales y discusiones abiertas con otros miembros.</li>
-				<li>**Canal de Sugerencias en DISCORD:** Para recomendaciones que quieras o veas necesarias que se implementen.</li>
+                <li>**Canal de Sugerencias en DISCORD:** Para recomendaciones que quieras o veas necesarias que se implementen.</li>
             </ul>
         `
     }
