@@ -70,6 +70,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const backToBlogButton = document.getElementById('backToBlog');
     const serverLogo = document.getElementById('serverLogo'); 
 
+    // Función principal para mostrar/ocultar secciones de nivel superior
     const showSection = (sectionId) => {
         contentSections.forEach(section => {
             section.classList.add('hidden-content');
@@ -82,9 +83,11 @@ document.addEventListener('DOMContentLoaded', () => {
             targetSection.classList.add('show-content');
         }
         
-        // Si no estamos en la sección del blog, ocultamos el contenedor de vista de artículo
-        if (sectionId !== 'blog-content' && sectionId !== 'article-view') {
+        // CORRECCIÓN CLAVE: Asegurar que el article-view siempre se oculte, 
+        // a menos que sea la sección de article-view (lo cual solo pasa al hacer clic en un artículo)
+        if (sectionId !== 'article-view') { 
             articleView.classList.add('hidden-content');
+            articleView.classList.remove('show-content');
         }
     };
 
@@ -181,7 +184,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('article-subtitle').textContent = article.subtitle;
         document.getElementById('article-body').innerHTML = article.content;
         
-        // CORRECCIÓN CLAVE: Asegurar que el blog se oculta y la vista de artículo se muestra
+        // Transición: Ocultar Blog y mostrar Artículo (Mutuamente excluyente)
         blogContent.classList.remove('show-content');
         blogContent.classList.add('hidden-content'); 
 
@@ -193,7 +196,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Botón de regresar del artículo
     backToBlogButton.addEventListener('click', () => {
-        // CORRECCIÓN CLAVE: Asegurar que la vista de artículo se oculta y el blog se muestra
+        // Transición: Ocultar Artículo y mostrar Blog (Mutuamente excluyente)
         articleView.classList.remove('show-content');
         articleView.classList.add('hidden-content');
 
