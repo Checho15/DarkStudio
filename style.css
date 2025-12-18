@@ -2,18 +2,20 @@
  * style.css
  * * Estilos CSS para Dark Studios Landing Page
  *
+ * * REVERTIDO: Se corrigieron los colores y estilos globales que cambiaron accidentalmente.
+ * * MANTENIDO: Se mantienen las correcciones en .full-article-body para la alineación del texto y el soporte de **negritas**.
  */
 
 /* ===================================================
- * 0. Globales y Reseteo
+ * 0. Globales y Reseteo (Ajustado a los colores originales)
  * =================================================== */
 :root {
-    --color-primary: #5c6bc0; /* Azul Indigo */
-    --color-secondary: #00bcd4; /* Cian */
-    --color-background: #121212; /* Fondo Oscuro */
-    --color-card-bg: #1e1e1e; /* Fondo de Tarjeta */
-    --color-text-light: #e0e0e0; /* Texto Claro */
-    --color-text-dim: #9e9e9e; /* Texto Opaco */
+    --color-primary: #1e88e5; /* Azul claro más intenso (Original) */
+    --color-secondary: #00bcd4; /* Cian (Mantenido) */
+    --color-background: #000000; /* Fondo Negro (Original) */
+    --color-card-bg: #111111; /* Fondo de Tarjeta oscuro (Original) */
+    --color-text-light: #ffffff; /* Texto Claro (Original) */
+    --color-text-dim: #bbbbbb; /* Texto Opaco (Original) */
     --color-danger: #e57373;
     --color-success: #81c784;
     --color-warning: #ffb74d;
@@ -47,7 +49,7 @@ body {
 
 
 /* ===================================================
- * 1. Preloader
+ * 1. Preloader (REVERTIDO a estilo original)
  * =================================================== */
 #preloader {
     position: fixed;
@@ -81,28 +83,29 @@ body {
 .progress-bar-container {
     width: 300px;
     height: 10px;
-    background-color: var(--color-card-bg);
+    background-color: var(--color-card-bg); /* Fondo de la barra más oscuro */
     border-radius: 5px;
     overflow: hidden;
+    border: 1px solid var(--color-primary); /* Borde primario (Ajuste para visibilidad) */
 }
 
 #progressBar {
     height: 100%;
     width: 0%;
-    background-color: var(--color-primary);
+    background-color: var(--color-primary); /* Color primario */
     transition: width 0.1s linear;
 }
 
 /* ===================================================
- * 2. Header
+ * 2. Header (REVERTIDO a estilo original)
  * =================================================== */
 .main-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 15px 20px;
-    background-color: var(--color-card-bg);
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    background-color: var(--color-card-bg); /* Fondo oscuro */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.4); /* Sombra oscura */
     position: sticky;
     top: 0;
     z-index: 1000;
@@ -116,10 +119,15 @@ body {
 .menu-toggle-button {
     background: none;
     border: none;
-    color: var(--color-text-light);
+    color: var(--color-primary); /* Color primario para el icono (Original) */
     font-size: 1.5rem;
     cursor: pointer;
     margin-right: 15px;
+    transition: color 0.2s;
+}
+
+.menu-toggle-button:hover {
+    color: var(--color-secondary);
 }
 
 .server-logo {
@@ -137,7 +145,7 @@ body {
     margin-left: 10px;
 }
 
-/* User Profile Dropdown */
+/* User Profile Dropdown (Ajustado al nuevo color primario) */
 .profile-dropdown {
     position: relative;
     cursor: pointer;
@@ -161,10 +169,10 @@ body {
     top: 100%;
     right: 0;
     background-color: var(--color-card-bg);
-    border: 1px solid var(--color-text-dim);
+    border: 1px solid #333;
     border-top: none;
     border-radius: 0 0 5px 5px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
     min-width: 180px;
     padding: 10px 0;
     z-index: 10;
@@ -174,7 +182,7 @@ body {
     padding: 5px 15px;
     font-weight: bold;
     color: var(--color-primary);
-    border-bottom: 1px solid var(--color-card-bg);
+    border-bottom: 1px solid #222;
     margin-bottom: 5px;
 }
 
@@ -195,11 +203,11 @@ body {
 }
 
 .dropdown-item:hover {
-    background-color: rgba(255, 255, 255, 0.1);
+    background-color: rgba(30, 136, 229, 0.1); /* Hover Primary color */
 }
 
 /* ===================================================
- * 3. Sidebar (Menú Lateral)
+ * 3. Sidebar (REVERTIDO a estilo original)
  * =================================================== */
 .sidebar {
     position: fixed;
@@ -208,7 +216,7 @@ body {
     width: 250px;
     height: 100%;
     background-color: var(--color-card-bg);
-    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.8);
     z-index: 1010;
     transition: transform 0.4s ease-in-out;
 }
@@ -263,11 +271,11 @@ body {
 
 .nav-link i {
     margin-right: 10px;
-    color: var(--color-secondary);
+    color: var(--color-primary); /* Iconos de color primario (Original) */
 }
 
 .nav-link:hover {
-    background-color: rgba(92, 107, 192, 0.1); /* Ligero hover de color primario */
+    background-color: rgba(30, 136, 229, 0.1); /* Hover Primary color */
     color: var(--color-text-light);
 }
 
@@ -288,13 +296,13 @@ body {
     transition: opacity 0.5s ease-in-out;
 }
 
-/* HOME */
+/* HOME (REVERTIDO el color de titulo) */
 .welcome-message {
     font-size: 3rem;
-    color: var(--color-primary);
+    color: var(--color-text-light); /* Titulo blanco (Original) */
     text-align: center;
     margin-top: 50px;
-    text-shadow: 0 0 10px rgba(92, 107, 192, 0.5);
+    text-shadow: 0 0 10px rgba(30, 136, 229, 0.3); /* Sombra suave azul */
 }
 
 .subtitle-message {
@@ -319,7 +327,7 @@ body {
 }
 
 /* ===================================================
- * 5. Blog Grid
+ * 5. Blog Grid (REVERTIDO a estilo original)
  * =================================================== */
 .blog-grid {
     display: grid;
@@ -332,7 +340,7 @@ body {
     background-color: var(--color-card-bg);
     border-radius: 8px;
     padding: 20px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
     cursor: pointer;
     transition: transform 0.2s, box-shadow 0.2s;
     border-left: 5px solid var(--color-primary);
@@ -340,7 +348,7 @@ body {
 
 .blog-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.7);
 }
 
 .card-title {
@@ -366,7 +374,7 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    border-top: 1px solid #333;
     padding-top: 10px;
 }
 
@@ -388,7 +396,7 @@ body {
 
 
 /* ===================================================
- * 6. Vista de Artículo Individual (article-view) - CORRECCIONES
+ * 6. Vista de Artículo Individual (article-view) - MANTENIDO Y CORREGIDO
  * =================================================== */
 
 .back-button {
@@ -419,14 +427,14 @@ body {
     background-color: var(--color-card-bg);
     padding: 40px;
     border-radius: 8px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
 }
 
 .full-article-title {
     font-size: 2.5rem;
     color: var(--color-primary);
     margin-bottom: 10px;
-    text-align: left; /* Asegurar alineación izquierda */
+    text-align: left; /* CORREGIDO */
 }
 
 .full-article-subtitle {
@@ -435,7 +443,7 @@ body {
     margin-bottom: 30px;
     padding-bottom: 15px;
     border-bottom: 1px solid #333;
-    text-align: left; /* Asegurar alineación izquierda */
+    text-align: left; /* CORREGIDO */
 }
 
 .full-article-body {
@@ -461,16 +469,13 @@ body {
     color: var(--color-text-light);
     margin: 25px 0 10px 0;
     text-align: left;
-    /* Para que el <h2> quede pegado a la línea:
-       Alineamos el margen izquierdo al mismo nivel que el padding-left del padre
-       y compensamos el padding-left del padre.
-    */
+    /* Para que el <h2> quede "pegado" a la línea: */
     margin-left: -20px; 
     padding-left: 20px; 
-    border-left: 3px solid var(--color-primary);
+    border-left: 3px solid var(--color-primary); /* Se usa un border-left para simular el pegado, y el before hace la línea continua */
 }
 .full-article-body h2::before {
-    content: ''; /* Limpiamos cualquier borde o línea que pudiera haber antes */
+    content: ''; /* Aseguramos que el h2 no tenga su propio before */
     border: none;
 }
 
@@ -495,7 +500,7 @@ body {
     margin-bottom: 8px;
 }
 
-/* Estilo para el formato de negrita (ahora sí visible gracias a <strong>) */
+/* Estilo para el formato de negrita (mantenido) */
 .full-article-body strong {
     color: var(--color-text-light);
     font-weight: bold;
@@ -503,10 +508,10 @@ body {
 
 
 /* ===================================================
- * 7. Sugerencias (Blog/FAQ)
+ * 7. Sugerencias (Blog/FAQ) (REVERTIDO a estilo original)
  * =================================================== */
 .suggestion-box {
-    background-color: #242424;
+    background-color: var(--color-card-bg);
     padding: 30px;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
@@ -547,7 +552,7 @@ body {
     padding: 12px;
     border: 1px solid #444;
     border-radius: 5px;
-    background-color: #333;
+    background-color: #222;
     color: var(--color-text-light);
     font-size: 1rem;
     transition: border-color 0.2s;
@@ -571,7 +576,7 @@ body {
 }
 
 .suggestion-button:hover:not(:disabled) {
-    background-color: #7986cb; /* Tono más claro de primary */
+    background-color: #42a5f5; /* Tono más claro de primary */
 }
 
 .suggestion-button:disabled {
@@ -586,7 +591,7 @@ body {
 
 
 /* ===================================================
- * 8. Guía (guia-content)
+ * 8. Guía (guia-content) (REVERTIDO a estilo original)
  * =================================================== */
 
 .guide-steps {
@@ -616,7 +621,7 @@ body {
 
 
 /* ===================================================
- * 9. Eventos (avances-content)
+ * 9. Eventos (avances-content) (REVERTIDO a estilo original)
  * =================================================== */
 .event-announcement {
     background-color: var(--color-card-bg);
@@ -646,7 +651,7 @@ body {
 
 
 /* ===================================================
- * 10. Footer
+ * 10. Footer (CORREGIDO: Se baja el footer para que no toque el contenido)
  * =================================================== */
 .main-footer {
     padding: 20px;
@@ -655,6 +660,7 @@ body {
     text-align: center;
     font-size: 0.9rem;
     border-top: 1px solid #333;
+    margin-top: auto; /* IMPORTANTE: Empuja el footer hacia abajo */
 }
 
 .creator-credit {
@@ -676,7 +682,7 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.8);
     z-index: 2000;
     transition: transform 0.3s ease-in-out;
 }
@@ -704,7 +710,7 @@ body {
 }
 
 .cookie-button:hover {
-    background-color: #7986cb;
+    background-color: #42a5f5;
 }
 
 .cookie-link-button {
@@ -730,7 +736,7 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.8);
+    background-color: rgba(0, 0, 0, 0.9);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -764,7 +770,7 @@ body {
 .terms-scroll-area {
     flex-grow: 1;
     overflow-y: auto;
-    padding-right: 15px; /* Espacio para la barra de scroll */
+    padding-right: 15px; 
     margin-bottom: 20px;
 }
 
