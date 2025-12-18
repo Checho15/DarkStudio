@@ -69,7 +69,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const blogContent = document.getElementById('blog-content');
     const articleView = document.getElementById('article-view');
     const backToBlogButton = document.getElementById('backToBlog');
-    const serverLogo = document.getElementById('serverLogo'); // El logo pequeño del header
+    const serverLogo = document.getElementById('serverLogo'); 
 
     const showSection = (sectionId) => {
         contentSections.forEach(section => {
@@ -104,7 +104,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     closeSidebar.addEventListener('click', closeSidebarPanel);
     
-    // CORRECCIÓN: Clic en el logo para ir al Home
+    // Clic en el logo para ir al Home
     serverLogo.addEventListener('click', () => {
         showSection('home-content');
         closeSidebarPanel();
@@ -114,7 +114,10 @@ document.addEventListener('DOMContentLoaded', () => {
     navLinks.forEach(link => {
         link.addEventListener('click', (e) => {
             e.preventDefault();
-            const targetId = e.currentTarget.getAttribute('href').substring(1) + '-content';
+            const href = e.currentTarget.getAttribute('href');
+            // Si es el enlace 'Home', usa la ID 'home-content'
+            const targetId = (href === '#home') ? 'home-content' : href.substring(1) + '-content';
+            
             showSection(targetId);
             
             // Cerrar sidebar tras navegar
@@ -122,34 +125,56 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // La sección inicial se establece en finishLoading, pero la inicializamos por si acaso
-    // NOTA: 'home-content' ya tiene la clase .show-content inicial en el HTML
-    // showSection('home-content'); 
-
     // ===================================================
-    // 3. LÓGICA DEL BLOG Y VISTA DE ARTÍCULO
+    // 3. LÓGICA DEL BLOG Y VISTA DE ARTÍCULO (CORREGIDO)
     // ===================================================
 
     const blogGridContainer = document.getElementById('blogGridContainer');
     const blogCardTemplate = document.getElementById('blogCardTemplate');
 
     const loadBlogArticles = () => {
-        // Asegúrate de que 'articles' esté definido en blog-data.js
+        // CORRECCIÓN: Usar la variable 'articles' del archivo blog-data.js
         if (typeof articles !== 'undefined' && blogGridContainer && blogCardTemplate) {
             blogGridContainer.innerHTML = ''; 
             
-            articles.forEach(article => {
+            // 1. Clonar el array para no modificar el original
+            let sortedArticles = [...articles];
+            
+            // 2. Lógica de ordenamiento: Los 'isPinned: true' van primero
+            sortedArticles.sort((a, b) => {
+                // Si 'a' está fijado y 'b' no, 'a' va primero (-1)
+                if (a.isPinned && !b.isPinned) return -1;
+                // Si 'b' está fijado y 'a' no, 'b' va primero (1)
+                if (!a.isPinned && b.isPinned) return 1;
+                // Si ambos tienen el mismo estado (fijado/no fijado), mantener el orden original o por ID
+                return 0; 
+            });
+
+
+            sortedArticles.forEach(article => {
                 const clone = blogCardTemplate.content.cloneNode(true);
                 const card = clone.querySelector('.blog-card');
                 
                 card.dataset.articleId = article.id;
-                clone.querySelector('.card-title').textContent = article.title;
+                
+                // Si está fijado, añadir un icono visual
+                if (article.isPinned) {
+                    clone.querySelector('.card-title').innerHTML = `📌 ${article.title}`;
+                } else {
+                    clone.querySelector('.card-title').textContent = article.title;
+                }
+                
                 clone.querySelector('.card-subtitle').textContent = article.subtitle;
                 
                 const description = article.description.length > 100 
                                   ? article.description.substring(0, 100) + '...'
                                   : article.description;
                 clone.querySelector('.card-description').textContent = description;
+                
+                // Agregar el ícono personalizado del artículo (ej. 🚀) al subtítulo si existe
+                const icon = article.icon || '';
+                clone.querySelector('.card-subtitle').textContent = `${icon} ${article.subtitle}`;
+
 
                 card.addEventListener('click', () => {
                     displayArticle(article);
@@ -181,6 +206,7 @@ document.addEventListener('DOMContentLoaded', () => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     });
     
+    // Cargar los artículos al inicio
     loadBlogArticles(); 
 
     // ===================================================
