@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     
     // ===================================================
-    // 1. GESTIÓN DEL PRELOADER (Corregido a tiempo fijo)
+    // 1. GESTIÓN DEL PRELOADER (Ajustado para forzar los 3 segundos)
     // ===================================================
 
     const preloader = document.getElementById('preloader');
@@ -9,37 +9,52 @@ document.addEventListener('DOMContentLoaded', () => {
     const progressBar = document.getElementById('progressBar');
     const loadingText = document.querySelector('.loading-text');
 
-    const TOTAL_TIME_MS = 3000; // 3 segundos de duración total
-    const INTERVAL_MS = 30;     // 30ms para cada paso de actualización
-    const TOTAL_STEPS = TOTAL_TIME_MS / INTERVAL_MS;
-    let currentStep = 0;
+    const MIN_LOAD_TIME = 3000; // Mínimo 3 segundos
+    const INTERVAL_MS = 50;     // Intervalo de actualización de la barra
+    const startLoadTime = Date.now();
+    let isLoaded = false;
+    let progress = 0;
 
-    const interval = setInterval(() => {
-        currentStep++;
-        const progress = Math.min(100, (currentStep / TOTAL_STEPS) * 100);
-        
-        progressBar.style.width = progress + '%';
-        loadingText.textContent = `Cargando... ${Math.floor(progress)}%`;
-
-        if (currentStep >= TOTAL_STEPS) {
-            clearInterval(interval);
-            
-            // Aseguramos que se muestre el 100%
-            progressBar.style.width = '100%';
-            loadingText.textContent = `Carga completa.`;
-
-            // Ocultar preloader
-            setTimeout(() => {
-                preloader.classList.add('fade-out');
-                
-                preloader.addEventListener('transitionend', () => {
-                    preloader.classList.add('hidden');
-                    mainContent.classList.remove('hidden');
-                }, { once: true });
-                
-            }, 500); // 0.5s de pausa final
+    // Simulación de progreso de carga (hasta el 90%)
+    const progressInterval = setInterval(() => {
+        if (progress < 90) {
+            progress += 1; 
+            progressBar.style.width = progress + '%';
+            loadingText.textContent = `Cargando... ${Math.floor(progress)}%`;
         }
     }, INTERVAL_MS);
+
+    // Función que se llama cuando el tiempo mínimo ha pasado
+    const finishLoading = () => {
+        if (isLoaded) return; // Evitar llamadas dobles
+
+        isLoaded = true;
+        clearInterval(progressInterval);
+        
+        // Completar la barra de progreso
+        progressBar.style.width = '100%';
+        loadingText.textContent = `Carga completa.`;
+
+        // Ocultar preloader con fade-out
+        setTimeout(() => {
+            preloader.classList.add('fade-out');
+            
+            preloader.addEventListener('transitionend', () => {
+                preloader.classList.add('hidden');
+                mainContent.classList.remove('hidden');
+                
+                // Muestra la sección HOME después de la carga
+                showSection('home-content');
+                
+            }, { once: true });
+            
+        }, 500); // 0.5s de pausa final
+    };
+
+    // Forzar el tiempo mínimo de 3 segundos
+    setTimeout(() => {
+        finishLoading();
+    }, MIN_LOAD_TIME);
 
 
     // ===================================================
@@ -54,6 +69,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const blogContent = document.getElementById('blog-content');
     const articleView = document.getElementById('article-view');
     const backToBlogButton = document.getElementById('backToBlog');
+    const serverLogo = document.getElementById('serverLogo'); // El logo pequeño del header
 
     const showSection = (sectionId) => {
         contentSections.forEach(section => {
@@ -70,22 +86,28 @@ document.addEventListener('DOMContentLoaded', () => {
         // Si no estamos en el blog, ocultar vista de artículo
         if (sectionId !== 'blog-content') {
             articleView.classList.add('hidden-content');
-            // Aseguramos que la grilla del blog esté visible si volvemos a ella (aunque oculta si estamos en otra sección)
-            // blogContent.classList.remove('hidden-content'); 
         }
     };
 
+    const closeSidebarPanel = () => {
+        sidebar.classList.remove('show');
+        setTimeout(() => {
+            sidebar.classList.add('hidden-sidebar');
+        }, 400); 
+    };
+    
     // Manejar la apertura/cierre del Sidebar
     menuToggle.addEventListener('click', () => {
         sidebar.classList.add('show');
         sidebar.classList.remove('hidden-sidebar');
     });
 
-    closeSidebar.addEventListener('click', () => {
-        sidebar.classList.remove('show');
-        setTimeout(() => {
-            sidebar.classList.add('hidden-sidebar');
-        }, 400); // Esperar a que termine la transición
+    closeSidebar.addEventListener('click', closeSidebarPanel);
+    
+    // CORRECCIÓN: Clic en el logo para ir al Home
+    serverLogo.addEventListener('click', () => {
+        showSection('home-content');
+        closeSidebarPanel();
     });
 
     // Manejar la navegación por enlaces
@@ -96,26 +118,24 @@ document.addEventListener('DOMContentLoaded', () => {
             showSection(targetId);
             
             // Cerrar sidebar tras navegar
-            sidebar.classList.remove('show');
-            setTimeout(() => {
-                sidebar.classList.add('hidden-sidebar');
-            }, 400); 
+            closeSidebarPanel();
         });
     });
 
-    // Cargar la sección inicial (HOME)
-    showSection('home-content'); 
+    // La sección inicial se establece en finishLoading, pero la inicializamos por si acaso
+    // NOTA: 'home-content' ya tiene la clase .show-content inicial en el HTML
+    // showSection('home-content'); 
 
     // ===================================================
-    // 3. LÓGICA DEL BLOG Y VISTA DE ARTÍCULO (Restaurada)
+    // 3. LÓGICA DEL BLOG Y VISTA DE ARTÍCULO
     // ===================================================
 
     const blogGridContainer = document.getElementById('blogGridContainer');
     const blogCardTemplate = document.getElementById('blogCardTemplate');
 
     const loadBlogArticles = () => {
+        // Asegúrate de que 'articles' esté definido en blog-data.js
         if (typeof articles !== 'undefined' && blogGridContainer && blogCardTemplate) {
-            // Limpiar por si acaso
             blogGridContainer.innerHTML = ''; 
             
             articles.forEach(article => {
@@ -126,7 +146,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 clone.querySelector('.card-title').textContent = article.title;
                 clone.querySelector('.card-subtitle').textContent = article.subtitle;
                 
-                // Truncar descripción para la tarjeta (si es necesario)
                 const description = article.description.length > 100 
                                   ? article.description.substring(0, 100) + '...'
                                   : article.description;
@@ -145,10 +164,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const displayArticle = (article) => {
         document.getElementById('article-title').textContent = article.title;
         document.getElementById('article-subtitle').textContent = article.subtitle;
-        // Asumiendo que article.content ya contiene el HTML estructurado
         document.getElementById('article-body').innerHTML = article.content;
         
-        // Ocultar la grilla del blog y mostrar la vista de artículo
         blogContent.classList.add('hidden-content');
         articleView.classList.remove('hidden-content');
         articleView.classList.add('show-content');
@@ -164,7 +181,6 @@ document.addEventListener('DOMContentLoaded', () => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     });
     
-    // Cargar los artículos al inicio
     loadBlogArticles(); 
 
     // ===================================================
@@ -337,6 +353,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const checkScroll = () => {
+        // Habilita el botón solo cuando se ha llegado al final del scroll
         const isScrolledToBottom = termsScrollArea.scrollTop + termsScrollArea.clientHeight >= termsScrollArea.scrollHeight - 20; 
         acceptTermsFinalButton.disabled = !isScrolledToBottom;
     };
