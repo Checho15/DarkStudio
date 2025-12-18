@@ -2,20 +2,22 @@
  * style.css
  * * Estilos CSS para Dark Studios Landing Page
  *
- * * REVERTIDO: Se corrigieron los colores y estilos globales que cambiaron accidentalmente.
- * * MANTENIDO: Se mantienen las correcciones en .full-article-body para la alineación del texto y el soporte de **negritas**.
+ * * RESTAURADO: Se han reestablecido los colores y estilos globales al diseño original:
+ * * Fondo Negro, Texto Blanco, Barra lateral oscura/morada, sin el azul brillante anterior.
+ * * Se mantiene el estilo de artículo individual corregido para la línea y la alineación.
  */
 
 /* ===================================================
- * 0. Globales y Reseteo (Ajustado a los colores originales)
+ * 0. Globales y Reseteo (AJUSTADO al diseño monocromático)
  * =================================================== */
 :root {
-    --color-primary: #1e88e5; /* Azul claro más intenso (Original) */
-    --color-secondary: #00bcd4; /* Cian (Mantenido) */
-    --color-background: #000000; /* Fondo Negro (Original) */
-    --color-card-bg: #111111; /* Fondo de Tarjeta oscuro (Original) */
-    --color-text-light: #ffffff; /* Texto Claro (Original) */
-    --color-text-dim: #bbbbbb; /* Texto Opaco (Original) */
+    --color-primary: #ffffff; /* Usamos blanco para los elementos principales (títulos) */
+    --color-secondary: #00bcd4; /* Cian (para acentos donde era necesario) */
+    --color-background: #000000; /* Fondo Negro */
+    --color-card-bg: #111111; /* Fondo de Tarjeta/Header (Negro sutil) */
+    --color-sidebar-bg: #1d1d1d; /* Fondo de Sidebar ligeramente diferente */
+    --color-text-light: #ffffff; /* Texto Claro */
+    --color-text-dim: #bbbbbb; /* Texto Opaco */
     --color-danger: #e57373;
     --color-success: #81c784;
     --color-warning: #ffb74d;
@@ -49,7 +51,7 @@ body {
 
 
 /* ===================================================
- * 1. Preloader (REVERTIDO a estilo original)
+ * 1. Preloader (CORREGIDO: Imagen de fondo y diseño original)
  * =================================================== */
 #preloader {
     position: fixed;
@@ -57,7 +59,13 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: var(--color-background);
+    background-color: var(--color-background); 
+    
+    /* Fondo de imagen de precarga (Añadido) */
+    background-image: url('fondo-preloader.jpg'); 
+    background-size: cover;
+    background-position: center;
+    
     display: flex;
     justify-content: center;
     align-items: center;
@@ -72,40 +80,45 @@ body {
 
 .loader-content {
     text-align: center;
+    /* Fondo semi-transparente para el texto/barra sobre la imagen */
+    background: rgba(0, 0, 0, 0.6); 
+    padding: 20px;
+    border-radius: 5px;
 }
 
 .loading-text {
     font-size: 1.2rem;
     margin-bottom: 15px;
     color: var(--color-text-light);
+    font-weight: bold;
 }
 
 .progress-bar-container {
     width: 300px;
     height: 10px;
-    background-color: var(--color-card-bg); /* Fondo de la barra más oscuro */
+    background-color: #333; /* Color de fondo del contenedor de la barra */
     border-radius: 5px;
     overflow: hidden;
-    border: 1px solid var(--color-primary); /* Borde primario (Ajuste para visibilidad) */
+    border: none; /* Sin borde */
 }
 
 #progressBar {
     height: 100%;
     width: 0%;
-    background-color: var(--color-primary); /* Color primario */
+    background-color: var(--color-text-light); /* Barra blanca/clara */
     transition: width 0.1s linear;
 }
 
 /* ===================================================
- * 2. Header (REVERTIDO a estilo original)
+ * 2. Header (Restaurado)
  * =================================================== */
 .main-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 15px 20px;
-    background-color: var(--color-card-bg); /* Fondo oscuro */
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.4); /* Sombra oscura */
+    background-color: var(--color-card-bg); 
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5); 
     position: sticky;
     top: 0;
     z-index: 1000;
@@ -119,7 +132,7 @@ body {
 .menu-toggle-button {
     background: none;
     border: none;
-    color: var(--color-primary); /* Color primario para el icono (Original) */
+    color: var(--color-text-light); /* Icono blanco */
     font-size: 1.5rem;
     cursor: pointer;
     margin-right: 15px;
@@ -127,7 +140,7 @@ body {
 }
 
 .menu-toggle-button:hover {
-    color: var(--color-secondary);
+    color: var(--color-text-dim);
 }
 
 .server-logo {
@@ -145,7 +158,7 @@ body {
     margin-left: 10px;
 }
 
-/* User Profile Dropdown (Ajustado al nuevo color primario) */
+/* User Profile Dropdown */
 .profile-dropdown {
     position: relative;
     cursor: pointer;
@@ -160,7 +173,7 @@ body {
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    border: 2px solid var(--color-primary);
+    border: 2px solid var(--color-text-light); /* Borde blanco sutil */
     object-fit: cover;
 }
 
@@ -172,7 +185,7 @@ body {
     border: 1px solid #333;
     border-top: none;
     border-radius: 0 0 5px 5px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.7);
     min-width: 180px;
     padding: 10px 0;
     z-index: 10;
@@ -181,7 +194,7 @@ body {
 .dropdown-name {
     padding: 5px 15px;
     font-weight: bold;
-    color: var(--color-primary);
+    color: var(--color-text-light);
     border-bottom: 1px solid #222;
     margin-bottom: 5px;
 }
@@ -203,11 +216,11 @@ body {
 }
 
 .dropdown-item:hover {
-    background-color: rgba(30, 136, 229, 0.1); /* Hover Primary color */
+    background-color: rgba(255, 255, 255, 0.05); /* Hover gris muy sutil */
 }
 
 /* ===================================================
- * 3. Sidebar (REVERTIDO a estilo original)
+ * 3. Sidebar (Restaurado a diseño original)
  * =================================================== */
 .sidebar {
     position: fixed;
@@ -215,7 +228,7 @@ body {
     left: 0;
     width: 250px;
     height: 100%;
-    background-color: var(--color-card-bg);
+    background-color: var(--color-sidebar-bg); /* Color oscuro de sidebar */
     box-shadow: 2px 0 5px rgba(0, 0, 0, 0.8);
     z-index: 1010;
     transition: transform 0.4s ease-in-out;
@@ -248,7 +261,7 @@ body {
 .sidebar-title {
     font-size: 1.2rem;
     font-weight: bold;
-    color: var(--color-primary);
+    color: var(--color-text-light);
 }
 
 .nav-list {
@@ -271,11 +284,11 @@ body {
 
 .nav-link i {
     margin-right: 10px;
-    color: var(--color-primary); /* Iconos de color primario (Original) */
+    color: var(--color-text-light); /* Iconos de color blanco */
 }
 
 .nav-link:hover {
-    background-color: rgba(30, 136, 229, 0.1); /* Hover Primary color */
+    background-color: rgba(255, 255, 255, 0.1); /* Hover gris sutil */
     color: var(--color-text-light);
 }
 
@@ -296,13 +309,13 @@ body {
     transition: opacity 0.5s ease-in-out;
 }
 
-/* HOME (REVERTIDO el color de titulo) */
+/* HOME (Restaurado a diseño original) */
 .welcome-message {
     font-size: 3rem;
-    color: var(--color-text-light); /* Titulo blanco (Original) */
+    color: #aeb4e7; /* El color morado/azulado sutil de la imagen */
     text-align: center;
     margin-top: 50px;
-    text-shadow: 0 0 10px rgba(30, 136, 229, 0.3); /* Sombra suave azul */
+    text-shadow: 0 0 10px rgba(174, 180, 231, 0.5); /* Sombra suave */
 }
 
 .subtitle-message {
@@ -316,18 +329,27 @@ body {
 .section-title {
     font-size: 2rem;
     color: var(--color-text-light);
-    border-bottom: 2px solid var(--color-primary);
+    border-bottom: 2px solid var(--color-text-light); /* Borde blanco (original) */
     padding-bottom: 10px;
     margin-bottom: 10px;
+    display: flex; /* Para centrar el emoji */
+    align-items: center;
+    justify-content: center;
+}
+
+.section-title i {
+    margin-right: 10px;
+    color: var(--color-secondary); /* Icono cian */
 }
 
 .section-subtitle {
     color: var(--color-text-dim);
+    text-align: center; /* Subtítulo centrado (original) */
     margin-bottom: 30px;
 }
 
 /* ===================================================
- * 5. Blog Grid (REVERTIDO a estilo original)
+ * 5. Blog Grid (Restaurado a diseño original)
  * =================================================== */
 .blog-grid {
     display: grid;
@@ -340,20 +362,20 @@ body {
     background-color: var(--color-card-bg);
     border-radius: 8px;
     padding: 20px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.7);
     cursor: pointer;
     transition: transform 0.2s, box-shadow 0.2s;
-    border-left: 5px solid var(--color-primary);
+    border-left: 5px solid var(--color-text-light); /* Borde blanco (original) */
 }
 
 .blog-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.7);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.9);
 }
 
 .card-title {
     font-size: 1.3rem;
-    color: var(--color-primary);
+    color: var(--color-text-light); /* Titulo blanco (original) */
     margin-bottom: 5px;
 }
 
@@ -391,12 +413,12 @@ body {
 }
 
 .card-options i:hover {
-    color: var(--color-primary);
+    color: var(--color-text-light);
 }
 
 
 /* ===================================================
- * 6. Vista de Artículo Individual (article-view) - MANTENIDO Y CORREGIDO
+ * 6. Vista de Artículo Individual (MANTENIDOS los arreglos)
  * =================================================== */
 
 .back-button {
@@ -418,8 +440,8 @@ body {
 }
 
 .back-button:hover {
-    background-color: var(--color-primary);
-    border-color: var(--color-primary);
+    background-color: rgba(255, 255, 255, 0.1);
+    border-color: var(--color-text-light);
     color: var(--color-text-light);
 }
 
@@ -427,14 +449,14 @@ body {
     background-color: var(--color-card-bg);
     padding: 40px;
     border-radius: 8px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.8);
 }
 
 .full-article-title {
     font-size: 2.5rem;
-    color: var(--color-primary);
+    color: var(--color-text-light); /* Titulo blanco (original) */
     margin-bottom: 10px;
-    text-align: left; /* CORREGIDO */
+    text-align: left; 
 }
 
 .full-article-subtitle {
@@ -443,7 +465,7 @@ body {
     margin-bottom: 30px;
     padding-bottom: 15px;
     border-bottom: 1px solid #333;
-    text-align: left; /* CORREGIDO */
+    text-align: left;
 }
 
 .full-article-body {
@@ -452,7 +474,7 @@ body {
     padding-left: 20px; /* Espacio para la línea vertical */
 }
 
-/* Línea vertical decorativa */
+/* Línea vertical decorativa (Blanca para seguir el diseño) */
 .full-article-body::before {
     content: '';
     position: absolute;
@@ -460,7 +482,7 @@ body {
     left: 0;
     width: 3px;
     height: 100%;
-    background-color: var(--color-primary);
+    background-color: var(--color-text-light); /* Línea blanca (original) */
     border-radius: 2px;
 }
 
@@ -472,10 +494,10 @@ body {
     /* Para que el <h2> quede "pegado" a la línea: */
     margin-left: -20px; 
     padding-left: 20px; 
-    border-left: 3px solid var(--color-primary); /* Se usa un border-left para simular el pegado, y el before hace la línea continua */
+    border-left: 3px solid var(--color-text-light); /* Borde blanco para simular el pegado */
 }
 .full-article-body h2::before {
-    content: ''; /* Aseguramos que el h2 no tenga su propio before */
+    content: ''; 
     border: none;
 }
 
@@ -508,7 +530,7 @@ body {
 
 
 /* ===================================================
- * 7. Sugerencias (Blog/FAQ) (REVERTIDO a estilo original)
+ * 7. Sugerencias (Blog/FAQ) (Restaurado a diseño original)
  * =================================================== */
 .suggestion-box {
     background-color: var(--color-card-bg);
@@ -520,7 +542,7 @@ body {
 }
 
 .suggestion-box h3 {
-    color: var(--color-primary);
+    color: var(--color-text-light); /* Título blanco */
     margin-bottom: 10px;
     font-size: 1.5rem;
 }
@@ -531,13 +553,14 @@ body {
 }
 
 .login-required-message {
-    background-color: var(--color-warning);
-    color: #333;
+    background-color: #333; /* Fondo gris oscuro */
+    color: var(--color-warning); /* Texto amarillo */
     padding: 10px;
     border-radius: 5px;
     margin-bottom: 15px;
     font-weight: bold;
     display: none; /* Controlado por JS */
+    border-left: 5px solid var(--color-warning);
 }
 
 #suggestionForm {
@@ -559,13 +582,13 @@ body {
 }
 
 .suggestion-input:focus {
-    border-color: var(--color-primary);
+    border-color: var(--color-text-light);
     outline: none;
 }
 
 .suggestion-button {
-    background-color: var(--color-primary);
-    color: white;
+    background-color: var(--color-text-light); /* Botón blanco (Original) */
+    color: var(--color-background); /* Texto negro */
     border: none;
     padding: 12px 20px;
     border-radius: 5px;
@@ -576,11 +599,12 @@ body {
 }
 
 .suggestion-button:hover:not(:disabled) {
-    background-color: #42a5f5; /* Tono más claro de primary */
+    background-color: var(--color-text-dim); 
 }
 
 .suggestion-button:disabled {
     background-color: #555;
+    color: #999;
     cursor: not-allowed;
 }
 
@@ -591,7 +615,7 @@ body {
 
 
 /* ===================================================
- * 8. Guía (guia-content) (REVERTIDO a estilo original)
+ * 8. Guía (guia-content) (Restaurado a diseño original)
  * =================================================== */
 
 .guide-steps {
@@ -605,7 +629,7 @@ body {
     padding: 25px;
     border-radius: 8px;
     border-top: 5px solid var(--color-secondary);
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.4);
 }
 
 .step-card h3 {
@@ -621,19 +645,19 @@ body {
 
 
 /* ===================================================
- * 9. Eventos (avances-content) (REVERTIDO a estilo original)
+ * 9. Eventos (avances-content) (Restaurado a diseño original)
  * =================================================== */
 .event-announcement {
     background-color: var(--color-card-bg);
     padding: 25px;
     border-radius: 8px;
-    border-left: 5px solid var(--color-primary);
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    border-left: 5px solid var(--color-text-light); /* Borde blanco */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.4);
     margin-bottom: 20px;
 }
 
 .event-announcement h3 {
-    color: var(--color-primary);
+    color: var(--color-text-light);
     font-size: 1.5rem;
     margin-bottom: 5px;
 }
@@ -651,7 +675,7 @@ body {
 
 
 /* ===================================================
- * 10. Footer (CORREGIDO: Se baja el footer para que no toque el contenido)
+ * 10. Footer (CORREGIDO: Se baja el footer)
  * =================================================== */
 .main-footer {
     padding: 20px;
@@ -660,7 +684,7 @@ body {
     text-align: center;
     font-size: 0.9rem;
     border-top: 1px solid #333;
-    margin-top: auto; /* IMPORTANTE: Empuja el footer hacia abajo */
+    margin-top: auto; /* Empuja el footer hacia abajo */
 }
 
 .creator-credit {
@@ -698,8 +722,8 @@ body {
 }
 
 .cookie-button {
-    background-color: var(--color-primary);
-    color: white;
+    background-color: var(--color-text-light);
+    color: var(--color-background);
     border: none;
     padding: 8px 15px;
     border-radius: 4px;
@@ -710,7 +734,7 @@ body {
 }
 
 .cookie-button:hover {
-    background-color: #42a5f5;
+    background-color: var(--color-text-dim);
 }
 
 .cookie-link-button {
@@ -724,8 +748,8 @@ body {
 }
 
 .cookie-link-button:hover {
-    color: var(--color-primary);
-    border-color: var(--color-primary);
+    color: var(--color-text-light);
+    border-color: var(--color-text-light);
 }
 
 
@@ -775,10 +799,10 @@ body {
 }
 
 .terms-scroll-area h1 {
-    color: var(--color-primary);
+    color: var(--color-text-light);
     margin-top: 0;
     margin-bottom: 20px;
-    border-bottom: 2px solid var(--color-primary);
+    border-bottom: 2px solid var(--color-text-light);
     padding-bottom: 10px;
 }
 
