@@ -58,7 +58,7 @@ const articles = [
         icon: '📞',
         title: 'Soporte Directo: Nuestros Canales de Atención al Usuario',
         subtitle: 'Conoce los medios oficiales para obtener ayuda, reportar problemas o hacer sugerencias.',
-        isPinned: false,
+        isPinned: true,
         description: 'Ofrecemos varios canales de soporte, incluyendo el sistema de tickets de Discord, correo electrónico especializado para reportes y foros de comunidad para preguntas generales...',
         content: `
             <h2>Cómo Contactar a Nuestro Equipo</h2>
@@ -82,4 +82,5 @@ const articles = [
         `
     }
 ];
+
 
