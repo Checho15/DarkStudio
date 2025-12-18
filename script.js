@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     
     // ===================================================
-    // 1. GESTIÓN DEL PRELOADER
+    // 1. GESTIÓN DEL PRELOADER (Corregido a tiempo fijo)
     // ===================================================
 
     const preloader = document.getElementById('preloader');
@@ -9,47 +9,38 @@ document.addEventListener('DOMContentLoaded', () => {
     const progressBar = document.getElementById('progressBar');
     const loadingText = document.querySelector('.loading-text');
 
-    let loadProgress = 0;
-    const totalSteps = 100;
-    const intervalTime = 20; // ms
+    const TOTAL_TIME_MS = 3000; // 3 segundos de duración total
+    const INTERVAL_MS = 30;     // 30ms para cada paso de actualización
+    const TOTAL_STEPS = TOTAL_TIME_MS / INTERVAL_MS;
+    let currentStep = 0;
 
-    const updateProgressBar = () => {
-        if (loadProgress < 95) {
-            loadProgress += 1;
-            progressBar.style.width = loadProgress + '%';
-            loadingText.textContent = `Cargando... ${loadProgress}%`;
-        } else if (loadProgress < 100) {
-            // Ralentizar la carga final para simular el final de la carga de recursos
-            loadProgress += 0.2;
-            progressBar.style.width = loadProgress + '%';
-            loadingText.textContent = `Cargando... ${Math.floor(loadProgress)}%`;
-        }
+    const interval = setInterval(() => {
+        currentStep++;
+        const progress = Math.min(100, (currentStep / TOTAL_STEPS) * 100);
         
-        if (loadProgress < 100) {
-            requestAnimationFrame(updateProgressBar);
+        progressBar.style.width = progress + '%';
+        loadingText.textContent = `Cargando... ${Math.floor(progress)}%`;
+
+        if (currentStep >= TOTAL_STEPS) {
+            clearInterval(interval);
+            
+            // Aseguramos que se muestre el 100%
+            progressBar.style.width = '100%';
+            loadingText.textContent = `Carga completa.`;
+
+            // Ocultar preloader
+            setTimeout(() => {
+                preloader.classList.add('fade-out');
+                
+                preloader.addEventListener('transitionend', () => {
+                    preloader.classList.add('hidden');
+                    mainContent.classList.remove('hidden');
+                }, { once: true });
+                
+            }, 500); // 0.5s de pausa final
         }
-    };
-    
-    // Iniciar la animación de la barra de progreso
-    requestAnimationFrame(updateProgressBar);
+    }, INTERVAL_MS);
 
-    window.addEventListener('load', () => {
-        // Asegurar que la barra llega al 100% justo antes de ocultar
-        loadProgress = 100;
-        progressBar.style.width = '100%';
-        loadingText.textContent = `Carga completa.`;
-
-        setTimeout(() => {
-            preloader.classList.add('fade-out');
-            
-            // Ocultar preloader y mostrar contenido principal
-            preloader.addEventListener('transitionend', () => {
-                preloader.classList.add('hidden');
-                mainContent.classList.remove('hidden');
-            }, { once: true });
-            
-        }, 500); // Pequeña pausa de 0.5s en el 100%
-    });
 
     // ===================================================
     // 2. NAVEGACIÓN Y SIDEBAR
@@ -79,7 +70,8 @@ document.addEventListener('DOMContentLoaded', () => {
         // Si no estamos en el blog, ocultar vista de artículo
         if (sectionId !== 'blog-content') {
             articleView.classList.add('hidden-content');
-            blogContent.classList.remove('hidden-content'); // Asegurar que la grilla del blog esté visible si volvemos a ella.
+            // Aseguramos que la grilla del blog esté visible si volvemos a ella (aunque oculta si estamos en otra sección)
+            // blogContent.classList.remove('hidden-content'); 
         }
     };
 
@@ -111,38 +103,49 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Cargar la sección inicial
+    // Cargar la sección inicial (HOME)
     showSection('home-content'); 
 
     // ===================================================
-    // 3. LÓGICA DEL BLOG Y VISTA DE ARTÍCULO
+    // 3. LÓGICA DEL BLOG Y VISTA DE ARTÍCULO (Restaurada)
     // ===================================================
 
     const blogGridContainer = document.getElementById('blogGridContainer');
     const blogCardTemplate = document.getElementById('blogCardTemplate');
 
-    if (typeof articles !== 'undefined' && blogGridContainer && blogCardTemplate) {
-        articles.forEach(article => {
-            const clone = blogCardTemplate.content.cloneNode(true);
-            const card = clone.querySelector('.blog-card');
+    const loadBlogArticles = () => {
+        if (typeof articles !== 'undefined' && blogGridContainer && blogCardTemplate) {
+            // Limpiar por si acaso
+            blogGridContainer.innerHTML = ''; 
             
-            card.dataset.articleId = article.id;
-            clone.querySelector('.card-title').textContent = article.title;
-            clone.querySelector('.card-subtitle').textContent = article.subtitle;
-            clone.querySelector('.card-description').textContent = article.description;
+            articles.forEach(article => {
+                const clone = blogCardTemplate.content.cloneNode(true);
+                const card = clone.querySelector('.blog-card');
+                
+                card.dataset.articleId = article.id;
+                clone.querySelector('.card-title').textContent = article.title;
+                clone.querySelector('.card-subtitle').textContent = article.subtitle;
+                
+                // Truncar descripción para la tarjeta (si es necesario)
+                const description = article.description.length > 100 
+                                  ? article.description.substring(0, 100) + '...'
+                                  : article.description;
+                clone.querySelector('.card-description').textContent = description;
 
-            card.addEventListener('click', () => {
-                displayArticle(article);
+                card.addEventListener('click', () => {
+                    displayArticle(article);
+                });
+
+                blogGridContainer.appendChild(clone);
             });
-
-            blogGridContainer.appendChild(clone);
-        });
-    }
+        }
+    };
 
     // Función para mostrar el contenido de un artículo
     const displayArticle = (article) => {
         document.getElementById('article-title').textContent = article.title;
         document.getElementById('article-subtitle').textContent = article.subtitle;
+        // Asumiendo que article.content ya contiene el HTML estructurado
         document.getElementById('article-body').innerHTML = article.content;
         
         // Ocultar la grilla del blog y mostrar la vista de artículo
@@ -150,7 +153,6 @@ document.addEventListener('DOMContentLoaded', () => {
         articleView.classList.remove('hidden-content');
         articleView.classList.add('show-content');
         
-        // Scroll al inicio de la página
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
@@ -161,6 +163,9 @@ document.addEventListener('DOMContentLoaded', () => {
         blogContent.classList.add('show-content');
         window.scrollTo({ top: 0, behavior: 'smooth' });
     });
+    
+    // Cargar los artículos al inicio
+    loadBlogArticles(); 
 
     // ===================================================
     // 4. LÓGICA DE SUGERENCIAS (Requiere Login)
@@ -175,20 +180,19 @@ document.addEventListener('DOMContentLoaded', () => {
     suggestionForm.addEventListener('submit', (e) => {
         e.preventDefault();
         
-        // Lógica de validación
         if (!suggestionInput.value.trim() || suggestionInput.value.length < 10) {
             suggestionMessage.textContent = "Error: La sugerencia debe tener al menos 10 caracteres.";
             suggestionMessage.style.color = '#e74c3c';
             return;
         }
 
-        // Aquí iría el código para enviar la sugerencia al backend (AJAX/Fetch)
-        // Usaremos un mensaje de éxito simulado por ahora
         const userEmail = localStorage.getItem('userEmail');
+        
+        // --- AQUÍ IRÍA EL FETCH AL SERVIDOR ---
         
         suggestionMessage.textContent = `¡Sugerencia enviada! Gracias, ${userEmail || 'Usuario'}. La revisaremos pronto.`;
         suggestionMessage.style.color = '#2ecc71';
-        suggestionInput.value = ''; // Limpiar el campo
+        suggestionInput.value = ''; 
         
         setTimeout(() => {
             suggestionMessage.textContent = '';
@@ -222,7 +226,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Muestra/Oculta el menú desplegable del perfil
     userProfileContainer.addEventListener('click', (e) => {
-        e.stopPropagation(); // Evita que el evento se propague al documento
+        e.stopPropagation(); 
         dropdownMenu.classList.toggle('hidden');
     });
 
@@ -235,37 +239,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Lógica para cerrar sesión (Google y Local Storage)
     signOutButton.addEventListener('click', () => {
-        // Cierre de sesión de Google (si se usa la librería)
         if (typeof google !== 'undefined' && google.accounts.id) {
-            google.accounts.id.disableAutoSelect(); // Deshabilita el inicio de sesión automático
-            // Nota: El SDK de Google no tiene un método directo para "cerrar sesión" del token JWT,
-            // sino que se elimina la credencial guardada. Para cerrar sesión del lado del cliente,
-            // simplemente eliminamos la información de la sesión guardada localmente.
+            google.accounts.id.disableAutoSelect(); 
         }
 
-        // Limpiar el estado de la sesión local
         localStorage.removeItem('userName');
         localStorage.removeItem('userEmail');
         localStorage.removeItem('userPicture');
 
-        // Actualizar la UI
         updateAuthUI(false);
     });
 
 
-    // Función global llamada por el SDK de Google (debe estar en el scope global)
+    // Función global llamada por el SDK de Google
     window.handleCredentialResponse = (response) => {
         if (response.credential) {
-            // Decodificar el token JWT
             const token = response.credential;
             const payload = JSON.parse(atob(token.split('.')[1]));
 
-            // Guardar información relevante en Local Storage
             localStorage.setItem('userName', payload.name);
             localStorage.setItem('userEmail', payload.email);
             localStorage.setItem('userPicture', payload.picture);
             
-            // Actualizar la interfaz de usuario
             updateAuthUI(true, payload.name, payload.picture);
         }
     };
@@ -273,26 +268,21 @@ document.addEventListener('DOMContentLoaded', () => {
     // Función para actualizar la Interfaz de Usuario de Autenticación
     const updateAuthUI = (isLoggedIn, name = '', picture = '') => {
         if (isLoggedIn) {
-            // Mostrar perfil, ocultar botón de Google
             googleSignInButton.style.display = 'none';
             userProfileContainer.classList.remove('hidden-profile');
             
-            // Usar los datos guardados en Local Storage si no se pasan como argumento
             name = name || localStorage.getItem('userName');
             picture = picture || localStorage.getItem('userPicture');
             
             profileImage.src = picture;
             dropdownName.textContent = name;
         } else {
-            // Ocultar perfil, mostrar botón de Google
             googleSignInButton.style.display = 'block';
             userProfileContainer.classList.add('hidden-profile');
             
-            // Ocultar el dropdown si estaba abierto
             dropdownMenu.classList.add('hidden');
         }
         
-        // Actualizar el estado de la sugerencia
         updateSuggestionFormState(isLoggedIn);
     };
 
@@ -329,10 +319,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const checkCookiePreference = () => {
         const accepted = localStorage.getItem('cookiesAccepted');
         if (accepted === 'true') {
-            // Cookies aceptadas, no mostrar nada
             cookieBanner.classList.add('hidden-cookie');
         } else {
-            // Mostrar banner si no ha sido aceptado
             cookieBanner.classList.remove('hidden-cookie');
         }
     };
@@ -340,7 +328,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // 6.2. Funciones del Modal
     const openModal = () => {
         termsModal.classList.remove('hidden-modal');
-        // Resetear el scroll y deshabilitar el botón al abrir
         termsScrollArea.scrollTop = 0;
         acceptTermsFinalButton.disabled = true;
     };
@@ -350,8 +337,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const checkScroll = () => {
-        // Habilitar el botón si el usuario ha scrollado casi hasta el final
-        const isScrolledToBottom = termsScrollArea.scrollTop + termsScrollArea.clientHeight >= termsScrollArea.scrollHeight - 20; // 20px de margen
+        const isScrolledToBottom = termsScrollArea.scrollTop + termsScrollArea.clientHeight >= termsScrollArea.scrollHeight - 20; 
         acceptTermsFinalButton.disabled = !isScrolledToBottom;
     };
 
@@ -361,9 +347,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     openTermsModalButton.addEventListener('click', openModal);
-
     closeModalButton.addEventListener('click', closeModal);
-
     termsScrollArea.addEventListener('scroll', checkScroll);
 
     acceptTermsFinalButton.addEventListener('click', () => {
@@ -373,7 +357,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Cierre del modal haciendo clic fuera
     termsModal.addEventListener('click', (e) => {
         if (e.target === termsModal) {
             closeModal();
