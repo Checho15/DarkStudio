@@ -1,737 +1,623 @@
-/*
- * style.css - Dark Studios Landing Page
- * Diseño minimalista: Negro, Blanco y Grises
- */
-
-/* ===================================================
- * 0. Globales y Reseteo
- * =================================================== */
-:root {
-    --color-primary: #ffffff;
-    --color-secondary: #666666;
-    --color-background: #000000;
-    --color-card-bg: #0a0a0a;
-    --color-text-light: #ffffff;
-    --color-text-dim: #999999;
-    --color-danger: #e57373;
-    --color-success: #81c784;
-    --color-warning: #ffb74d;
-}
-
-* {
-    box-sizing: border-box;
+/* Estilos generales */
+body {
     margin: 0;
     padding: 0;
-}
-
-body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-    background-color: var(--color-background);
-    color: var(--color-text-light);
+    font-family: sans-serif;
+    background-color: #000;
+    color: white;
     min-height: 100vh;
-    display: flex;
-    flex-direction: column;
 }
 
 .hidden {
-    display: none !important;
+    display: none;
 }
 
-.hidden-content {
-    display: none !important;
-}
+/* -------------------------------------------------------------------- */
+/* ESTILOS DEL PRELOADER */
+/* -------------------------------------------------------------------- */
 
-.show-content {
-    display: block;
-}
-
-/* ===================================================
- * 1. Preloader
- * =================================================== */
 #preloader {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
+    z-index: 9999;
+    
+    display: flex;
+    justify-content: center;
+    align-items: flex-end; 
+    padding-bottom: 10vh; 
+    
+    transition: opacity 1s ease-in-out, visibility 1s ease-in-out;
+    
+    /* === CONFIGURACIÓN DE LA IMAGEN DE FONDO === */
     background-image: url('fondo-preloader.jpg'); 
     background-size: cover;
     background-position: center;
-    background-color: #000;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding-bottom: 100px;
-    z-index: 9999;
-    opacity: 1;
-    transition: opacity 0.5s ease-out;
+    background-repeat: no-repeat;
 }
 
-#preloader.fade-out {
-    opacity: 0;
+/* Oscurecer el fondo para mejor contraste */
+#preloader::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.2); 
+    z-index: 1;
 }
 
 .loader-content {
     text-align: center;
-    width: 100%;
-    max-width: 350px;
-    padding: 0 20px;
+    z-index: 10;
 }
 
+/* Estilos de la BARRA DE PROGRESO (Blanco y Negro) */
 .loading-text {
-    font-size: 0.9rem;
-    margin-bottom: 15px;
-    color: #ffffff;
-    font-weight: 300;
-    letter-spacing: 0.5px;
+    font-size: 1.2em;
+    font-weight: normal; 
+    color: #FFF; 
+    letter-spacing: 2px;
+    margin-bottom: 10px;
+    text-shadow: 0 0 3px #000; 
 }
 
 .progress-bar-container {
-    width: 100%;
-    height: 2px;
-    background-color: rgba(255, 255, 255, 0.15);
-    border-radius: 1px;
+    width: 300px;
+    height: 15px;
+    background-color: transparent; 
+    border-radius: 8px;
     overflow: hidden;
+    margin: 10px auto;
+    border: 2px solid #000; /* Borde Negro */
 }
 
 #progressBar {
     height: 100%;
-    width: 0%;
-    background-color: #ffffff;
-    transition: width 0.05s linear;
+    width: 0%; 
+    background-color: #FFF; /* Barra Blanca */
+    transition: width 0.1s linear; 
 }
 
-/* ===================================================
- * 2. Header
- * =================================================== */
+.fade-out {
+    opacity: 0;
+    visibility: hidden;
+}
+
+/* -------------------------------------------------------------------- */
+/* ESTILOS DEL HEADER Y NAVEGACIÓN PRINCIPAL */
+/* -------------------------------------------------------------------- */
+
 .main-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 60px; 
+    background-color: #111; 
+    color: #FFF;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 15px 20px;
-    background-color: #0a0a0a;
-    box-shadow: none;
-    border-bottom: 1px solid #1a1a1a;
-    position: sticky;
-    top: 0;
-    z-index: 1000;
+    padding: 0 20px; 
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    z-index: 500; 
+    box-sizing: border-box; 
 }
 
 .header-left {
     display: flex;
     align-items: center;
+    gap: 15px;
+}
+
+/* CORRECCIÓN: Añadido cursor pointer para indicar que es clickeable */
+.server-logo {
+    height: 40px; 
+    filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.2));
+    cursor: pointer; /* Indicar que es un botón de Home */
 }
 
 .menu-toggle-button {
     background: none;
     border: none;
-    color: #ffffff;
-    font-size: 1.3rem;
+    color: #FFF;
+    font-size: 1.5em;
     cursor: pointer;
-    margin-right: 15px;
-    transition: color 0.2s;
+    padding: 10px;
+    transition: color 0.3s;
 }
 
 .menu-toggle-button:hover {
-    color: #999999;
+    color: #AAA;
 }
 
-.server-logo {
-    height: 35px; 
-    cursor: pointer;
-}
+/* -------------------------------------------------------------------- */
+/* ESTILOS DEL SIDEBAR (MENÚ LATERAL) */
+/* -------------------------------------------------------------------- */
 
-.header-right {
-    display: flex;
-    align-items: center;
-}
-
-#googleSignInButton {
-    margin-left: 10px;
-}
-
-.profile-dropdown {
-    position: relative;
-    cursor: pointer;
-    margin-left: 10px;
-}
-
-.hidden-profile {
-    display: none;
-}
-
-.profile-image {
-    width: 35px;
-    height: 35px;
-    border-radius: 50%;
-    border: 1px solid #333333;
-    object-fit: cover;
-}
-
-.dropdown-menu {
-    position: absolute;
-    top: 100%;
-    right: 0;
-    background-color: #0a0a0a;
-    border: 1px solid #1a1a1a;
-    border-top: none;
-    border-radius: 0 0 4px 4px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.8);
-    min-width: 180px;
-    padding: 8px 0;
-    z-index: 10;
-}
-
-.dropdown-name {
-    padding: 8px 15px;
-    font-weight: normal;
-    color: #ffffff;
-    border-bottom: 1px solid #1a1a1a;
-    margin-bottom: 5px;
-    font-size: 0.9rem;
-}
-
-.dropdown-item {
-    background: none;
-    border: none;
-    color: #999999;
-    width: 100%;
-    text-align: left;
-    padding: 10px 15px;
-    cursor: pointer;
-    transition: background-color 0.2s, color 0.2s;
-    font-size: 0.9rem;
-}
-
-.dropdown-item i {
-    margin-right: 8px;
-}
-
-.dropdown-item:hover {
-    background-color: #111111;
-    color: #ffffff;
-}
-
-/* ===================================================
- * 3. Sidebar
- * =================================================== */
 .sidebar {
     position: fixed;
     top: 0;
     left: 0;
-    width: 250px;
+    width: 280px; 
     height: 100%;
-    background-color: #0a0a0a;
-    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.5);
-    z-index: 1010;
+    background-color: #1a1a1a; 
+    color: #FFF;
+    z-index: 600; 
+    transform: translateX(-100%); 
     transition: transform 0.4s ease-in-out;
-    border-right: 1px solid #1a1a1a;
-}
-
-.hidden-sidebar {
-    transform: translateX(-100%);
+    box-shadow: 4px 0 10px rgba(0, 0, 0, 0.7);
+    padding-top: 60px; 
 }
 
 .sidebar.show {
-    transform: translateX(0);
+    transform: translateX(0); 
+}
+
+.hidden-sidebar {
+    /* Mantener solo para la lógica de transición, no display: none */
 }
 
 .sidebar-header {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 60px;
+    background-color: #000;
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    padding: 15px 20px;
-    border-bottom: 1px solid #1a1a1a;
+    padding: 0 20px;
+    box-sizing: border-box; 
+}
+
+.sidebar-title {
+    font-size: 1.2em;
+    font-weight: bold;
+    margin-left: 10px;
+    color: #FFF;
 }
 
 .close-sidebar-button {
     background: none;
     border: none;
-    color: #ffffff;
-    font-size: 1.3rem;
+    color: #FFF;
+    font-size: 1.5em;
     cursor: pointer;
+    transition: color 0.3s;
 }
 
-.sidebar-title {
-    font-size: 1rem;
-    font-weight: 300;
-    color: #ffffff;
-    letter-spacing: 1px;
+.close-sidebar-button:hover {
+    color: #CCC;
 }
 
 .nav-list {
     list-style: none;
-    padding: 0;
+    padding: 20px 0;
+    margin: 0;
 }
 
 .nav-list li {
-    border-bottom: 1px solid #1a1a1a;
+    margin: 0;
 }
 
 .nav-link {
     display: block;
     padding: 15px 20px;
-    color: #999999;
     text-decoration: none;
-    font-size: 0.9rem;
-    transition: background-color 0.2s, color 0.2s;
-    font-weight: 300;
-}
-
-.nav-link i {
-    margin-right: 10px;
-    color: #999999;
+    color: #FFF;
+    font-family: 'Georgia', serif; 
+    font-size: 1.1em;
+    transition: background-color 0.3s, color 0.3s;
 }
 
 .nav-link:hover {
-    background-color: #111111;
-    color: #ffffff;
+    background-color: #333; 
+    color: #EEE;
 }
 
-.nav-link:hover i {
-    color: #ffffff;
+.nav-link i {
+    margin-right: 15px;
+    width: 20px; 
 }
 
-/* ===================================================
- * 4. Contenido Principal
- * =================================================== */
-.page-content {
-    flex-grow: 1;
-    padding: 30px;
-    max-width: 1200px;
-    margin: 0 auto;
+/* -------------------------------------------------------------------- */
+/* ESTILOS DEL CONTENIDO PRINCIPAL Y HOME */
+/* -------------------------------------------------------------------- */
+
+#mainContent {
+    position: relative; 
     width: 100%;
+    min-height: 100vh;
+    background-color: #000;
+    display: flex;
+    flex-direction: column;
+    padding: 0;
 }
 
-.content-section {
-    padding: 20px 0;
-    min-height: 50vh; 
-    transition: opacity 0.5s ease-in-out;
+.page-content {
+    flex-grow: 1; 
+    padding-top: 60px; 
+    width: 100%;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
 }
 
 .welcome-message {
-    font-size: 3rem;
-    color: #ffffff;
-    text-align: center;
-    margin-top: 50px;
-    font-weight: 300;
-    letter-spacing: 2px;
+    font-size: 3em;
+    margin-bottom: 10px;
+    padding-top: 50px;
 }
 
 .subtitle-message {
-    font-size: 1rem;
-    color: #999999;
+    font-size: 1.2em;
+    color: #CCC;
+}
+
+
+/* -------------------------------------------------------------------- */
+/* ESTILOS DE SECCIONES DE CONTENIDO */
+/* -------------------------------------------------------------------- */
+
+.content-section {
+    width: 100%;
+    max-width: 1200px;
+    padding: 20px;
+    padding-top: 80px; 
+    box-sizing: border-box;
     text-align: center;
-    margin-top: 15px;
-    font-weight: 300;
+    flex-grow: 1; 
+}
+
+.hidden-content {
+    display: none;
+}
+.show-content {
+    display: block;
 }
 
 .section-title {
-    font-size: 1.8rem;
-    color: #ffffff;
-    border-bottom: 1px solid #333333;
-    padding-bottom: 15px;
-    margin-bottom: 10px;
-    display: flex;
-    align-items: center;
-    font-weight: 300;
-}
-
-.section-title i {
-    margin-right: 12px;
-    color: #ffffff;
+    font-size: 2.5em;
+    color: #FFF;
+    margin-bottom: 5px;
+    border-bottom: 2px solid #333;
+    padding-bottom: 10px;
 }
 
 .section-subtitle {
-    color: #999999;
-    text-align: center;
+    font-size: 1.1em;
+    color: #AAA;
     margin-bottom: 40px;
-    font-size: 0.95rem;
-    font-weight: 300;
 }
 
-/* ===================================================
- * 5. Blog Grid
- * =================================================== */
+/* -------------------------------------------------------------------- */
+/* ESTILOS DEL BLOG GRID Y TARJETAS */
+/* -------------------------------------------------------------------- */
+
 .blog-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-    gap: 25px;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
     margin-bottom: 50px;
+    text-align: left;
 }
 
 .blog-card {
-    background-color: #0a0a0a;
-    border-radius: 0;
-    padding: 25px;
-    box-shadow: none;
+    background-color: #1a1a1a; 
+    border: 1px solid #333;
+    border-radius: 8px;
+    padding: 20px;
+    transition: all 0.3s ease-in-out; 
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
     cursor: pointer;
-    transition: transform 0.2s, background-color 0.2s;
-    border: 1px solid #1a1a1a;
+    display: flex;
+    flex-direction: column;
 }
 
+/* EFECTO HOVER SUAVE */
 .blog-card:hover {
-    transform: translateY(-3px);
-    background-color: #111111;
-    border-color: #2a2a2a;
+    background-color: #252525; 
+    border-color: #666; 
+    transform: translateY(-3px); 
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.5);
 }
 
 .card-title {
-    font-size: 1.1rem;
-    color: #ffffff;
-    margin-bottom: 8px;
-    font-weight: 400;
+    font-size: 1.4em;
+    color: #FFF;
+    margin-top: 0;
+    margin-bottom: 5px;
 }
 
 .card-subtitle {
-    font-size: 0.85rem;
-    color: #666666;
-    margin-bottom: 12px;
+    font-size: 0.95em;
+    color: #999;
+    font-style: italic;
+    margin-bottom: 15px;
 }
 
 .card-description {
-    font-size: 0.9rem;
-    color: #999999;
-    line-height: 1.5;
-    margin-bottom: 18px;
+    font-size: 1em;
+    color: #CCC;
+    flex-grow: 1; 
+    margin-bottom: 20px;
 }
 
 .card-footer {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-top: 1px solid #1a1a1a;
-    padding-top: 12px;
+    border-top: 1px solid #333;
+    padding-top: 10px;
 }
 
 .read-more {
-    color: #ffffff;
-    font-weight: normal;
-    font-size: 0.85rem;
+    font-size: 0.9em;
+    color: #FFF;
+    font-weight: bold;
+    transition: color 0.3s;
+}
+
+.read-more:hover {
+    color: #AAA;
 }
 
 .card-options i {
-    color: #666666;
+    color: #999;
+    font-size: 1.1em;
+    margin-left: 10px;
     cursor: pointer;
-    transition: color 0.2s;
+    transition: color 0.3s;
 }
 
 .card-options i:hover {
-    color: #ffffff;
+    color: #FFF;
 }
 
-/* ===================================================
- * 6. Vista de Artículo Individual
- * =================================================== */
+/* -------------------------------------------------------------------- */
+/* ESTILOS DE VISTA DE ARTÍCULO ÚNICO */
+/* -------------------------------------------------------------------- */
+
+.article-mode {
+    text-align: left; 
+    padding-top: 100px; 
+    max-width: 900px; 
+    margin: auto;
+}
+
 .back-button {
     background: none;
-    border: 1px solid #333333;
-    color: #999999;
-    padding: 10px 15px;
-    border-radius: 0;
+    border: none;
+    color: #FFF;
+    font-size: 1em;
+    font-weight: bold;
     cursor: pointer;
-    font-size: 0.9rem;
     margin-bottom: 30px;
-    transition: background-color 0.2s, color 0.2s, border-color 0.2s;
-    display: inline-flex;
+    padding: 10px 0;
+    transition: color 0.3s;
+    display: flex;
     align-items: center;
 }
 
-.back-button i {
-    margin-right: 8px;
+.back-button:hover {
+    color: #AAA;
 }
 
-.back-button:hover {
-    background-color: #111111;
-    border-color: #666666;
-    color: #ffffff;
+.back-button i {
+    margin-right: 10px;
 }
 
 .full-article-content {
-    background-color: #0a0a0a;
-    padding: 40px;
-    border-radius: 0;
-    box-shadow: none;
-    border: 1px solid #1a1a1a;
+    background-color: #111;
+    padding: 30px;
+    border-radius: 8px;
+    border: 1px solid #333;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
 }
 
 .full-article-title {
-    font-size: 2rem;
-    color: #ffffff;
-    margin-bottom: 12px;
-    text-align: left;
-    font-weight: 300;
+    font-size: 2.2em;
+    color: #FFF;
+    border-bottom: 2px solid #555;
+    padding-bottom: 15px;
+    margin-top: 0;
+    margin-bottom: 10px;
 }
 
 .full-article-subtitle {
-    font-size: 1rem;
-    color: #666666;
-    margin-bottom: 30px;
-    padding-bottom: 15px;
-    border-bottom: 1px solid #1a1a1a;
-    text-align: left;
+    font-size: 1.1em;
+    color: #AAA;
     font-style: italic;
-}
-
-.full-article-body {
-    position: relative;
-    padding-left: 0;
-}
-
-.full-article-body::before {
-    display: none;
+    margin-bottom: 30px;
 }
 
 .full-article-body h2 {
-    font-size: 1.4rem;
-    color: #ffffff;
-    margin: 30px 0 15px 0;
-    text-align: left;
-    font-weight: 300;
-    border-left: none;
-    margin-left: 0;
-    padding-left: 0;
+    color: #FFF;
+    font-size: 1.5em;
+    margin-top: 30px;
+    border-left: 3px solid #FFF; 
+    padding-left: 10px;
 }
 
-.full-article-body h2::before {
-    content: ''; 
-    border: none;
-}
-
-.full-article-body p,
-.full-article-body ul,
-.full-article-body li {
-    font-size: 1rem;
-    line-height: 1.7;
-    color: #999999;
-    text-align: left;
-    margin-bottom: 15px;
+.full-article-body p, .full-article-body ul {
+    color: #CCC;
+    line-height: 1.6;
+    margin-bottom: 20px;
 }
 
 .full-article-body ul {
     margin-left: 20px;
-    padding-left: 20px; 
-    list-style-type: disc;
+    list-style: disc;
 }
 
-.full-article-body li {
-    margin-bottom: 8px;
-}
+/* -------------------------------------------------------------------- */
+/* ESTILOS DE CAJA DE SUGERENCIAS */
+/* -------------------------------------------------------------------- */
 
-.full-article-body strong {
-    color: #ffffff;
-    font-weight: 500;
-}
-
-/* ===================================================
- * 7. Sugerencias
- * =================================================== */
 .suggestion-box {
-    background-color: #0a0a0a;
+    background-color: #0d0d0d;
+    border: 2px solid #555;
+    border-radius: 8px;
     padding: 30px;
-    border-radius: 0;
-    box-shadow: none;
-    margin-top: 50px;
+    margin: 50px auto;
+    max-width: 600px;
     text-align: center;
-    border: 1px solid #1a1a1a;
 }
 
 .suggestion-box h3 {
-    color: #ffffff;
-    margin-bottom: 12px;
-    font-size: 1.3rem;
-    font-weight: 300;
+    color: #FFF;
+    font-size: 1.5em;
+    margin-top: 0;
 }
 
 .suggestion-box p {
-    color: #999999;
+    color: #CCC;
     margin-bottom: 20px;
-    font-size: 0.9rem;
 }
 
-.login-required-message {
-    background-color: #1a1a1a;
-    color: #ffb74d;
-    padding: 12px;
-    border-radius: 0;
-    margin-bottom: 20px;
-    font-weight: normal;
-    display: none;
-    border-left: 3px solid #ffb74d;
-    font-size: 0.9rem;
-}
-
-#suggestionForm {
+.suggestion-box form {
     display: flex;
     gap: 10px;
-    max-width: 600px;
-    margin: 0 auto 15px auto;
 }
 
 .suggestion-input {
     flex-grow: 1;
-    padding: 12px;
-    border: 1px solid #1a1a1a;
-    border-radius: 0;
-    background-color: #000000;
-    color: #ffffff;
-    font-size: 0.9rem;
-    transition: border-color 0.2s;
-}
-
-.suggestion-input:focus {
-    border-color: #333333;
-    outline: none;
+    padding: 10px;
+    background-color: #222;
+    border: 1px solid #555;
+    color: #FFF;
+    border-radius: 4px;
+    font-size: 1em;
 }
 
 .suggestion-button {
-    background-color: #ffffff;
-    color: #000000;
+    background-color: #FFF;
+    color: #000;
     border: none;
-    padding: 12px 20px;
-    border-radius: 0;
+    padding: 10px 20px;
+    border-radius: 4px;
     cursor: pointer;
-    font-size: 0.9rem;
-    font-weight: normal;
-    transition: background-color 0.2s;
+    font-weight: bold;
+    transition: background-color 0.3s;
 }
 
-.suggestion-button:hover:not(:disabled) {
-    background-color: #cccccc; 
+.suggestion-button:hover {
+    background-color: #CCC;
 }
-
+/* Estilo para botón deshabilitado */
 .suggestion-button:disabled {
-    background-color: #333333;
-    color: #666666;
+    background-color: #444;
+    color: #999;
     cursor: not-allowed;
 }
 
+
 .note {
-    font-size: 0.8rem;
-    color: #666666;
+    font-size: 0.8em;
+    color: #777;
+    margin-top: 15px;
 }
 
-/* ===================================================
- * 8. Guía
- * =================================================== */
+/* -------------------------------------------------------------------- */
+/* NUEVOS ESTILOS PARA GUÍA Y EVENTOS (EJEMPLOS) */
+/* -------------------------------------------------------------------- */
+
 .guide-steps {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 25px;
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 50px;
 }
 
 .step-card {
-    background-color: #0a0a0a;
-    padding: 25px;
-    border-radius: 0;
-    border: 1px solid #1a1a1a;
-    box-shadow: none;
+    background-color: #1a1a1a;
+    border: 1px solid #333;
+    border-radius: 8px;
+    padding: 20px;
+    max-width: 350px;
+    text-align: left;
 }
 
 .step-card h3 {
-    color: #ffffff;
-    margin-bottom: 12px;
-    font-size: 1.2rem;
-    font-weight: 300;
+    color: #FFF;
+    font-size: 1.3em;
+    border-bottom: 1px solid #555;
+    padding-bottom: 10px;
 }
 
-.step-card p {
-    color: #999999;
-    line-height: 1.6;
-    font-size: 0.9rem;
-}
-
-/* ===================================================
- * 9. Eventos
- * =================================================== */
 .event-announcement {
-    background-color: #0a0a0a;
-    padding: 25px;
-    border-radius: 0;
-    border: 1px solid #1a1a1a;
-    box-shadow: none;
-    margin-bottom: 20px;
+    background-color: #222;
+    border: 2px solid #FFF;
+    border-radius: 10px;
+    padding: 30px;
+    max-width: 700px;
+    margin: 20px auto;
+    text-align: left;
 }
 
 .event-announcement h3 {
-    color: #ffffff;
-    font-size: 1.3rem;
-    margin-bottom: 10px;
-    font-weight: 300;
+    color: #FFF;
+    font-size: 1.8em;
+    margin-top: 0;
 }
 
-.event-announcement p {
-    color: #999999;
-    margin-bottom: 10px;
-    line-height: 1.6;
-    font-size: 0.9rem;
-}
-
-.event-announcement .date {
+.date {
     font-style: italic;
-    font-size: 0.85rem;
-    color: #666666;
+    color: #AAA;
 }
 
-/* ===================================================
- * 10. Footer
- * =================================================== */
-.main-footer {
-    padding: 20px;
-    background-color: #0a0a0a;
-    color: #666666;
-    text-align: center;
-    font-size: 0.85rem;
-    border-top: 1px solid #1a1a1a;
-    margin-top: auto;
-}
 
-.creator-credit {
-    margin-top: 5px;
-    font-size: 0.75rem;
-    color: #555555;
-}
+/* -------------------------------------------------------------------- */
+/* ESTILOS DEL COOKIE BANNER Y MODAL */
+/* -------------------------------------------------------------------- */
 
-/* ===================================================
- * 11. Cookies y Modal
- * =================================================== */
 .cookie-banner {
     position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    background-color: rgba(10, 10, 10, 0.95);
-    color: #ffffff;
-    padding: 15px 20px;
-    display: flex;
-    justify-content: space-between;
+    bottom: 20px; 
+    left: 50%;
+    transform: translateX(-50%); 
+    max-width: 600px;
+    padding: 15px 25px;
+    border-radius: 8px;
+    background-color: #1a1a1a; 
+    color: #f0f0f0; 
+    border: 1px solid #444; 
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5); 
+    z-index: 999; 
+    display: flex; 
     align-items: center;
-    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.8);
-    z-index: 2000;
-    transition: transform 0.3s ease-in-out;
-    border-top: 1px solid #1a1a1a;
+    gap: 15px; 
+    opacity: 1;
+    transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
 }
 
 .hidden-cookie {
-    transform: translateY(100%);
+    display: none !important; 
 }
 
 .cookie-text {
-    flex-grow: 1;
-    margin-right: 20px;
-    font-size: 0.9rem;
+    flex-grow: 1; 
+    font-size: 0.9em;
+    margin: 0;
 }
 
 .cookie-button {
-    background-color: #ffffff;
+    background-color: #ffffff; 
     color: #000000;
     border: none;
-    padding: 8px 15px;
-    border-radius: 0;
+    padding: 8px 18px;
+    border-radius: 4px;
     cursor: pointer;
-    font-weight: normal;
-    transition: background-color 0.2s;
-    margin-left: 10px;
+    font-weight: bold;
+    transition: background-color 0.3s, transform 0.1s;
 }
 
 .cookie-button:hover {
@@ -740,30 +626,35 @@ body {
 
 .cookie-link-button {
     background: none;
-    border: 1px solid #333333;
-    color: #999999;
-    padding: 8px 15px;
-    border-radius: 0;
+    border: none;
+    color: #aaa; 
+    text-decoration: underline;
+    font-size: 0.85em;
     cursor: pointer;
-    transition: color 0.2s, border-color 0.2s;
+    padding: 0;
 }
-
 .cookie-link-button:hover {
-    color: #ffffff;
-    border-color: #666666;
+    color: #fff;
+}
+#acceptTermsFinal:disabled {
+    background-color: #444;
+    cursor: not-allowed;
+    color: #AAA;
 }
 
+/* MODAL DE TÉRMINOS */
 .modal {
     position: fixed;
-    top: 0;
+    z-index: 1000; 
     left: 0;
+    top: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.95);
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.9); 
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 3000;
 }
 
 .hidden-modal {
@@ -771,124 +662,225 @@ body {
 }
 
 .modal-content {
-    background-color: #0a0a0a;
-    padding: 30px;
-    border-radius: 0;
+    background-color: #111; 
+    margin: auto;
+    padding: 20px 40px 20px 20px; 
+    border: 1px solid #444;
+    border-radius: 10px;
+    width: 80%;
     max-width: 700px;
-    width: 90%;
     max-height: 90vh;
     display: flex;
     flex-direction: column;
-    border: 1px solid #1a1a1a;
+    position: relative;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.7);
 }
 
 .close-button {
-    color: #999999;
-    float: right;
+    color: #FFF;
     font-size: 28px;
     font-weight: bold;
+    position: absolute;
+    top: 10px;
+    right: 15px; 
     cursor: pointer;
-    align-self: flex-end;
+    transition: color 0.3s;
+    z-index: 10;
 }
 
 .close-button:hover {
-    color: #ffffff;
+    color: #CCC;
 }
 
 .terms-scroll-area {
+    overflow-y: auto; 
     flex-grow: 1;
-    overflow-y: auto;
-    padding-right: 15px; 
-    margin-bottom: 20px;
+    padding-top: 20px;
+    padding-bottom: 20px;
 }
 
-.terms-scroll-area h1 {
-    color: #ffffff;
-    margin-top: 0;
-    margin-bottom: 20px;
-    border-bottom: 1px solid #333333;
-    padding-bottom: 10px;
-    font-weight: 300;
+/* Estilos de texto dentro del modal */
+.modal-content h1 {
+    color: #FFF;
+    border-bottom: 2px solid #555;
+    padding-bottom: 15px;
+    margin-bottom: 30px;
+    text-align: center;
+    font-size: 2em;
 }
-
-.terms-scroll-area h2 {
-    color: #ffffff;
-    margin-top: 20px;
-    margin-bottom: 10px;
-    font-size: 1.2rem;
-    font-weight: 300;
-}
-
-.terms-scroll-area p, .terms-scroll-area ul {
-    color: #999999;
-    line-height: 1.6;
-    margin-bottom: 15px;
-}
-
-.terms-scroll-area ul {
-    margin-left: 20px;
+.modal-content h2 {
+    color: #FFF; 
+    margin-top: 30px;
+    border-left: 3px solid #FFF; 
     padding-left: 10px;
-    list-style-type: disc;
+    font-size: 1.3em;
 }
-
+.modal-content p, .modal-content ul {
+    margin-bottom: 20px;
+    font-size: 1em;
+    color: #CCC; 
+}
+.modal-content ul {
+    list-style: square;
+    margin-left: 40px;
+}
 .studio-name {
-    font-weight: normal;
-    color: #ffffff;
+    color: #FFF; 
+    font-weight: bold;
 }
 
 .modal-footer {
-    border-top: 1px solid #1a1a1a;
     padding-top: 15px;
     text-align: center;
+    border-top: 1px solid #333;
+    background-color: #111; 
 }
 
-.modal-footer .cookie-button:disabled {
-    background-color: #333333;
-    color: #666666;
-    cursor: not-allowed;
+/* -------------------------------------------------------------------- */
+/* ESTILOS DEL FOOTER */
+/* -------------------------------------------------------------------- */
+.main-footer {
+    width: 100%;
+    background-color: #0d0d0d;
+    color: #666;
+    text-align: center;
+    padding: 20px 0;
+    font-size: 0.9em;
+    border-top: 1px solid #1a1a1a;
+    box-sizing: border-box;
 }
 
-/* ===================================================
- * 12. Media Queries
- * =================================================== */
-@media (max-width: 768px) {
-    .page-content {
-        padding: 20px 15px;
-    }
+.main-footer p {
+    margin: 5px 0;
+}
 
-    .welcome-message {
-        font-size: 2rem;
-    }
-    
-    .blog-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .main-footer {
-        padding: 15px 10px;
-    }
-    
-    #suggestionForm {
-        flex-direction: column;
-    }
-    
-    .suggestion-button {
-        width: 100%;
-    }
-    
-    .cookie-banner {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-    
-    .cookie-text {
-        margin-bottom: 10px;
-        margin-right: 0;
-    }
-    
-    .cookie-button, .cookie-link-button {
-        width: 100%;
-        margin-left: 0;
-        margin-top: 10px;
-    }
+.creator-credit {
+    font-size: 0.9em; 
+    color: #444;
+}
+
+/* ==================================================================== */
+/* === ESTILOS: INICIO DE SESIÓN Y PERFIL (HEADER-RIGHT) === */
+/* ==================================================================== */
+
+/* Contenedores de sesión */
+.header-right {
+    position: relative; 
+    display: flex;
+    align-items: center;
+    gap: 15px; 
+    /* CORRECCIÓN: Ajuste de padding-right y margen para el botón de Google */
+    padding-right: 20px; 
+}
+
+/* El contenedor del botón de Google debe ajustarse para que no se recorte */
+.g_id_signin {
+    transform: scale(0.95); 
+    transform-origin: right center;
+    margin-right: -10px; /* Recuperar parte del espacio perdido en el scale */
+}
+
+
+.hidden-profile {
+    display: none !important;
+}
+
+/* ---------------------------------- */
+/* Estilos del Perfil/Dropdown */
+/* ---------------------------------- */
+.profile-dropdown {
+    position: relative;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    padding: 5px; 
+    border-radius: 50%;
+    transition: background-color 0.2s;
+    margin-right: -10px; 
+}
+
+.profile-dropdown:hover {
+    background-color: #222; 
+}
+
+.profile-image {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #555; 
+    transition: transform 0.2s;
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: 55px; 
+    right: 0;
+    background-color: #1a1a1a; 
+    border: 1px solid #333;
+    border-radius: 8px;
+    padding: 10px;
+    width: 200px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    z-index: 100;
+    opacity: 1; 
+    transition: opacity 0.3s ease-in-out;
+}
+
+.dropdown-menu.hidden {
+    display: none;
+}
+
+.dropdown-name {
+    font-weight: bold;
+    color: #FFF;
+    margin-bottom: 10px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid #333;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 1.1em;
+}
+
+.dropdown-item {
+    background: none;
+    border: none;
+    color: #e74c3c; 
+    width: 100%;
+    text-align: left;
+    padding: 8px 5px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background-color 0.2s, color 0.2s;
+    border-radius: 4px;
+}
+
+.dropdown-item i {
+    margin-right: 10px;
+}
+
+.dropdown-item:hover {
+    color: #FFF;
+    background-color: #c0392b; 
+}
+
+/* ---------------------------------- */
+/* Estilos para el mensaje de login requerido (en suggestion-box) */
+/* ---------------------------------- */
+.login-required-message {
+    padding: 15px;
+    background-color: #333;
+    border-left: 5px solid #f39c12; 
+    margin-bottom: 20px;
+    border-radius: 4px;
+    display: none; 
+    text-align: left;
+}
+
+.login-required-message p {
+    color: #fff;
+    margin: 0;
+    font-weight: bold;
+    font-size: 1em;
 }
