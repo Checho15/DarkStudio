@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     
     // ===================================================
-    // 1. GESTIÓN DEL PRELOADER (CON PORCENTAJE Y 3 SEGUNDOS)
+    // 1. GESTIÓN DEL PRELOADER (Ajustado para forzar los 3 segundos)
     // ===================================================
 
     const preloader = document.getElementById('preloader');
@@ -9,29 +9,32 @@ document.addEventListener('DOMContentLoaded', () => {
     const progressBar = document.getElementById('progressBar');
     const loadingText = document.querySelector('.loading-text');
 
-    const MIN_LOAD_TIME = 3000; 
-    const INTERVAL_MS = 30;     
+    const MIN_LOAD_TIME = 3000; // Mínimo 3 segundos
+    const INTERVAL_MS = 50;     // Intervalo de actualización de la barra
     let isLoaded = false;
     let progress = 0;
 
+    // Simulación de progreso de carga (hasta el 90%)
     const progressInterval = setInterval(() => {
-        if (progress < 100) {
+        if (progress < 90) {
             progress += 1; 
             progressBar.style.width = progress + '%';
             loadingText.textContent = `Cargando... ${Math.floor(progress)}%`;
         }
     }, INTERVAL_MS);
 
+    // Función que se llama cuando el tiempo mínimo ha pasado
     const finishLoading = () => {
-        if (isLoaded) return; 
+        if (isLoaded) return; // Evitar llamadas dobles
 
         isLoaded = true;
         clearInterval(progressInterval);
         
-        progress = 100;
+        // Completar la barra de progreso
         progressBar.style.width = '100%';
-        loadingText.textContent = `Cargando... 100%`;
+        loadingText.textContent = `Carga completa.`;
 
+        // Ocultar preloader con fade-out
         setTimeout(() => {
             preloader.classList.add('fade-out');
             
@@ -39,13 +42,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 preloader.classList.add('hidden');
                 mainContent.classList.remove('hidden');
                 
+                // Muestra la sección HOME después de la carga
                 showSection('home-content');
                 
             }, { once: true });
             
-        }, 300); 
+        }, 500); // 0.5s de pausa final
     };
 
+    // Forzar el tiempo mínimo de 3 segundos
     setTimeout(() => {
         finishLoading();
     }, MIN_LOAD_TIME);
@@ -65,6 +70,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const backToBlogButton = document.getElementById('backToBlog');
     const serverLogo = document.getElementById('serverLogo'); 
 
+    // Función principal para mostrar/ocultar secciones de nivel superior
     const showSection = (sectionId) => {
         contentSections.forEach(section => {
             section.classList.add('hidden-content');
@@ -77,6 +83,8 @@ document.addEventListener('DOMContentLoaded', () => {
             targetSection.classList.add('show-content');
         }
         
+        // CORRECCIÓN CLAVE: Asegurar que el article-view siempre se oculte, 
+        // a menos que sea la sección de article-view (lo cual solo pasa al hacer clic en un artículo)
         if (sectionId !== 'article-view') { 
             articleView.classList.add('hidden-content');
             articleView.classList.remove('show-content');
@@ -90,6 +98,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 400); 
     };
     
+    // Manejar la apertura/cierre del Sidebar
     menuToggle.addEventListener('click', () => {
         sidebar.classList.add('show');
         sidebar.classList.remove('hidden-sidebar');
@@ -97,11 +106,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     closeSidebar.addEventListener('click', closeSidebarPanel);
     
+    // Clic en el logo para ir al Home
     serverLogo.addEventListener('click', () => {
         showSection('home-content');
         closeSidebarPanel();
     });
 
+    // Manejar la navegación por enlaces
     navLinks.forEach(link => {
         link.addEventListener('click', (e) => {
             e.preventDefault();
@@ -110,20 +121,17 @@ document.addEventListener('DOMContentLoaded', () => {
             
             showSection(targetId);
             
+            // Cerrar sidebar tras navegar
             closeSidebarPanel();
         });
     });
 
     // ===================================================
-    // 3. LÓGICA DEL BLOG Y VISTA DE ARTÍCULO 
+    // 3. LÓGICA DEL BLOG Y VISTA DE ARTÍCULO (CORREGIDA)
     // ===================================================
 
     const blogGridContainer = document.getElementById('blogGridContainer');
     const blogCardTemplate = document.getElementById('blogCardTemplate');
-
-    const formatArticleContent = (content) => {
-        return content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-    };
 
     const loadBlogArticles = () => {
         if (typeof articles !== 'undefined' && blogGridContainer && blogCardTemplate) {
@@ -131,11 +139,13 @@ document.addEventListener('DOMContentLoaded', () => {
             
             let sortedArticles = [...articles];
             
+            // Lógica de ordenamiento: Los 'isPinned: true' van primero
             sortedArticles.sort((a, b) => {
                 if (a.isPinned && !b.isPinned) return -1;
                 if (!a.isPinned && b.isPinned) return 1;
                 return 0; 
             });
+
 
             sortedArticles.forEach(article => {
                 const clone = blogCardTemplate.content.cloneNode(true);
@@ -143,6 +153,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 card.dataset.articleId = article.id;
                 
+                // Si está fijado, añadir un icono visual
                 if (article.isPinned) {
                     clone.querySelector('.card-title').innerHTML = `📌 ${article.title}`;
                 } else {
@@ -157,6 +168,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                   : article.description;
                 clone.querySelector('.card-description').textContent = description;
 
+                // Evento de clic para mostrar el artículo completo
                 card.addEventListener('click', () => {
                     displayArticle(article);
                 });
@@ -166,13 +178,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
+    // Función para mostrar el contenido de un artículo
     const displayArticle = (article) => {
         document.getElementById('article-title').textContent = article.title;
         document.getElementById('article-subtitle').textContent = article.subtitle;
+        document.getElementById('article-body').innerHTML = article.content;
         
-        const formattedContent = formatArticleContent(article.content);
-        document.getElementById('article-body').innerHTML = formattedContent;
-        
+        // Transición: Ocultar Blog y mostrar Artículo (Mutuamente excluyente)
         blogContent.classList.remove('show-content');
         blogContent.classList.add('hidden-content'); 
 
@@ -182,7 +194,9 @@ document.addEventListener('DOMContentLoaded', () => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
+    // Botón de regresar del artículo
     backToBlogButton.addEventListener('click', () => {
+        // Transición: Ocultar Artículo y mostrar Blog (Mutuamente excluyente)
         articleView.classList.remove('show-content');
         articleView.classList.add('hidden-content');
 
@@ -192,10 +206,11 @@ document.addEventListener('DOMContentLoaded', () => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     });
     
+    // Cargar los artículos al inicio
     loadBlogArticles(); 
 
     // ===================================================
-    // 4. LÓGICA DE SUGERENCIAS 
+    // 4. LÓGICA DE SUGERENCIAS (Requiere Login)
     // ===================================================
 
     const suggestionForm = document.getElementById('suggestionForm');
@@ -215,7 +230,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const userEmail = localStorage.getItem('userEmail');
         
-        // AQUÍ IRÍA EL FETCH AL SERVIDOR
+        // --- AQUÍ IRÍA EL FETCH AL SERVIDOR ---
         
         suggestionMessage.textContent = `¡Sugerencia enviada! Gracias, ${userEmail || 'Usuario'}. La revisaremos pronto.`;
         suggestionMessage.style.color = '#2ecc71';
@@ -226,6 +241,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 5000);
     });
     
+    // Función para actualizar el estado del formulario de sugerencias
     const updateSuggestionFormState = (isLoggedIn) => {
         if (isLoggedIn) {
             suggestionInput.disabled = false;
@@ -238,6 +254,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
+
     // ===================================================
     // 5. GESTIÓN DE SESIÓN DE GOOGLE
     // ===================================================
@@ -249,17 +266,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const dropdownName = document.getElementById('dropdownName');
     const signOutButton = document.getElementById('signOutButton');
 
+    // Muestra/Oculta el menú desplegable del perfil
     userProfileContainer.addEventListener('click', (e) => {
         e.stopPropagation(); 
         dropdownMenu.classList.toggle('hidden');
     });
 
+    // Cierra el menú cuando se hace clic fuera
     document.addEventListener('click', (e) => {
         if (!userProfileContainer.contains(e.target) && !dropdownMenu.contains(e.target)) {
             dropdownMenu.classList.add('hidden');
         }
     });
 
+    // Lógica para cerrar sesión (Google y Local Storage)
     signOutButton.addEventListener('click', () => {
         if (typeof google !== 'undefined' && google.accounts.id) {
             google.accounts.id.disableAutoSelect(); 
@@ -272,6 +292,8 @@ document.addEventListener('DOMContentLoaded', () => {
         updateAuthUI(false);
     });
 
+
+    // Función global llamada por el SDK de Google
     window.handleCredentialResponse = (response) => {
         if (response.credential) {
             const token = response.credential;
@@ -285,6 +307,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
+    // Función para actualizar la Interfaz de Usuario de Autenticación
     const updateAuthUI = (isLoggedIn, name = '', picture = '') => {
         if (isLoggedIn) {
             googleSignInButton.style.display = 'none';
@@ -305,6 +328,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateSuggestionFormState(isLoggedIn);
     };
 
+    // Verificar el estado de la sesión al cargar la página
     const checkUserSession = () => {
         const userName = localStorage.getItem('userName');
         const userPicture = localStorage.getItem('userPicture');
@@ -328,6 +352,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const acceptTermsFinalButton = document.getElementById('acceptTermsFinal');
     const termsScrollArea = document.querySelector('.terms-scroll-area');
 
+    // 6.1. Funciones de Cookies
     const setCookiePreference = (status) => {
         localStorage.setItem('cookiesAccepted', status);
         cookieBanner.classList.add('hidden-cookie');
@@ -342,6 +367,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
+    // 6.2. Funciones del Modal
     const openModal = () => {
         termsModal.classList.remove('hidden-modal');
         termsScrollArea.scrollTop = 0;
@@ -353,10 +379,12 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const checkScroll = () => {
+        // Habilita el botón solo cuando se ha llegado al final del scroll
         const isScrolledToBottom = termsScrollArea.scrollTop + termsScrollArea.clientHeight >= termsScrollArea.scrollHeight - 20; 
         acceptTermsFinalButton.disabled = !isScrolledToBottom;
     };
 
+    // 6.3. Eventos de Cookies y Modal
     acceptCookiesButton.addEventListener('click', () => {
         setCookiePreference('true');
     });
