@@ -233,7 +233,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const suggestionMessage = document.getElementById('suggestionMessage');
     const loginRequiredMessage = document.getElementById('loginRequiredMessage');
 
-    suggestionForm.addEventListener('submit', (e) => {
+    suggestionForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         
         if (!suggestionInput.value.trim() || suggestionInput.value.length < 10) {
@@ -243,16 +243,49 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const userEmail = localStorage.getItem('userEmail');
+        const suggestionText = suggestionInput.value.trim();
         
-        // --- AQUÍ IRÍA EL FETCH AL SERVIDOR ---
+        // Deshabilitar el botón mientras se envía
+        suggestionButton.disabled = true;
+        suggestionButton.textContent = 'Enviando...';
         
-        suggestionMessage.textContent = `¡Sugerencia enviada! Gracias, ${userEmail || 'Usuario'}. La revisaremos pronto.`;
-        suggestionMessage.style.color = '#2ecc71';
-        suggestionInput.value = ''; 
-        
-        setTimeout(() => {
-            suggestionMessage.textContent = '';
-        }, 5000);
+        try {
+            // IMPORTANTE: Cambia esta URL por tu URL de Railway
+            const response = await fetch('https://darkbots-production.up.railway.app/sugerencia', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    text: suggestionText,
+                    userEmail: userEmail || 'Anónimo'
+                })
+            });
+            
+            const data = await response.json();
+            
+            if (data.status === 'success') {
+                suggestionMessage.textContent = `¡Sugerencia enviada! Gracias, ${userEmail || 'Usuario'}. La revisaremos pronto.`;
+                suggestionMessage.style.color = '#2ecc71';
+                suggestionInput.value = ''; 
+            } else {
+                suggestionMessage.textContent = `Error: ${data.message}`;
+                suggestionMessage.style.color = '#e74c3c';
+            }
+            
+        } catch (error) {
+            console.error('Error al enviar sugerencia:', error);
+            suggestionMessage.textContent = 'Error de conexión. Intenta nuevamente.';
+            suggestionMessage.style.color = '#e74c3c';
+        } finally {
+            // Rehabilitar el botón
+            suggestionButton.disabled = false;
+            suggestionButton.textContent = 'Solicitar Artículo';
+            
+            setTimeout(() => {
+                suggestionMessage.textContent = '';
+            }, 5000);
+        }
     });
     
     // Función para actualizar el estado del formulario de sugerencias
