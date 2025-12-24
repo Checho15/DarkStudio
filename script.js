@@ -127,6 +127,14 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // ===================================================
+    // FUNCIÓN AUXILIAR: Convertir **texto** a <strong>texto</strong>
+    // ===================================================
+    const convertMarkdownBold = (text) => {
+        // Reemplaza **texto** con <strong>texto</strong>
+        return text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    };
+
+    // ===================================================
     // 3. LÓGICA DEL BLOG Y VISTA DE ARTÍCULO (CORREGIDA)
     // ===================================================
 
@@ -182,7 +190,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const displayArticle = (article) => {
         document.getElementById('article-title').textContent = article.title;
         document.getElementById('article-subtitle').textContent = article.subtitle;
-        document.getElementById('article-body').innerHTML = article.content;
+        
+        // CORRECCIÓN: Convertir **texto** a <strong>texto</strong> antes de mostrar
+        const contentWithBold = convertMarkdownBold(article.content);
+        document.getElementById('article-body').innerHTML = contentWithBold;
         
         // Transición: Ocultar Blog y mostrar Artículo (Mutuamente excluyente)
         blogContent.classList.remove('show-content');
