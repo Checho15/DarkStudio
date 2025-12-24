@@ -385,6 +385,10 @@ body {
 /* ESTILOS DE VISTA DE ARTÍCULO ÚNICO */
 /* -------------------------------------------------------------------- */
 
+#article-view {
+    text-align: left; 
+}
+
 .article-mode {
     text-align: left; 
     padding-top: 100px; 
