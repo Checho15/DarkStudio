@@ -11,7 +11,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const MIN_LOAD_TIME = 3000; // Mínimo 3 segundos
     const INTERVAL_MS = 50;     // Intervalo de actualización de la barra
-    const startLoadTime = Date.now();
     let isLoaded = false;
     let progress = 0;
 
@@ -69,8 +68,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const blogContent = document.getElementById('blog-content');
     const articleView = document.getElementById('article-view');
     const backToBlogButton = document.getElementById('backToBlog');
-    const serverLogo = document.getElementById('serverLogo'); // El logo pequeño del header
+    const serverLogo = document.getElementById('serverLogo'); 
 
+    // Función principal para mostrar/ocultar secciones de nivel superior
     const showSection = (sectionId) => {
         contentSections.forEach(section => {
             section.classList.add('hidden-content');
@@ -83,9 +83,11 @@ document.addEventListener('DOMContentLoaded', () => {
             targetSection.classList.add('show-content');
         }
         
-        // Si no estamos en el blog, ocultar vista de artículo
-        if (sectionId !== 'blog-content') {
+        // CORRECCIÓN CLAVE: Asegurar que el article-view siempre se oculte, 
+        // a menos que sea la sección de article-view (lo cual solo pasa al hacer clic en un artículo)
+        if (sectionId !== 'article-view') { 
             articleView.classList.add('hidden-content');
+            articleView.classList.remove('show-content');
         }
     };
 
@@ -104,7 +106,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     closeSidebar.addEventListener('click', closeSidebarPanel);
     
-    // CORRECCIÓN: Clic en el logo para ir al Home
+    // Clic en el logo para ir al Home
     serverLogo.addEventListener('click', () => {
         showSection('home-content');
         closeSidebarPanel();
@@ -114,7 +116,9 @@ document.addEventListener('DOMContentLoaded', () => {
     navLinks.forEach(link => {
         link.addEventListener('click', (e) => {
             e.preventDefault();
-            const targetId = e.currentTarget.getAttribute('href').substring(1) + '-content';
+            const href = e.currentTarget.getAttribute('href');
+            const targetId = (href === '#home') ? 'home-content' : href.substring(1) + '-content';
+            
             showSection(targetId);
             
             // Cerrar sidebar tras navegar
@@ -122,35 +126,49 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // La sección inicial se establece en finishLoading, pero la inicializamos por si acaso
-    // NOTA: 'home-content' ya tiene la clase .show-content inicial en el HTML
-    // showSection('home-content'); 
-
     // ===================================================
-    // 3. LÓGICA DEL BLOG Y VISTA DE ARTÍCULO
+    // 3. LÓGICA DEL BLOG Y VISTA DE ARTÍCULO (CORREGIDA)
     // ===================================================
 
     const blogGridContainer = document.getElementById('blogGridContainer');
     const blogCardTemplate = document.getElementById('blogCardTemplate');
 
     const loadBlogArticles = () => {
-        // Asegúrate de que 'articles' esté definido en blog-data.js
         if (typeof articles !== 'undefined' && blogGridContainer && blogCardTemplate) {
             blogGridContainer.innerHTML = ''; 
             
-            articles.forEach(article => {
+            let sortedArticles = [...articles];
+            
+            // Lógica de ordenamiento: Los 'isPinned: true' van primero
+            sortedArticles.sort((a, b) => {
+                if (a.isPinned && !b.isPinned) return -1;
+                if (!a.isPinned && b.isPinned) return 1;
+                return 0; 
+            });
+
+
+            sortedArticles.forEach(article => {
                 const clone = blogCardTemplate.content.cloneNode(true);
                 const card = clone.querySelector('.blog-card');
                 
                 card.dataset.articleId = article.id;
-                clone.querySelector('.card-title').textContent = article.title;
-                clone.querySelector('.card-subtitle').textContent = article.subtitle;
+                
+                // Si está fijado, añadir un icono visual
+                if (article.isPinned) {
+                    clone.querySelector('.card-title').innerHTML = `📌 ${article.title}`;
+                } else {
+                    clone.querySelector('.card-title').textContent = article.title;
+                }
+                
+                const icon = article.icon || '';
+                clone.querySelector('.card-subtitle').textContent = `${icon} ${article.subtitle}`;
                 
                 const description = article.description.length > 100 
                                   ? article.description.substring(0, 100) + '...'
                                   : article.description;
                 clone.querySelector('.card-description').textContent = description;
 
+                // Evento de clic para mostrar el artículo completo
                 card.addEventListener('click', () => {
                     displayArticle(article);
                 });
@@ -166,7 +184,10 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('article-subtitle').textContent = article.subtitle;
         document.getElementById('article-body').innerHTML = article.content;
         
-        blogContent.classList.add('hidden-content');
+        // Transición: Ocultar Blog y mostrar Artículo (Mutuamente excluyente)
+        blogContent.classList.remove('show-content');
+        blogContent.classList.add('hidden-content'); 
+
         articleView.classList.remove('hidden-content');
         articleView.classList.add('show-content');
         
@@ -175,12 +196,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Botón de regresar del artículo
     backToBlogButton.addEventListener('click', () => {
+        // Transición: Ocultar Artículo y mostrar Blog (Mutuamente excluyente)
+        articleView.classList.remove('show-content');
         articleView.classList.add('hidden-content');
+
         blogContent.classList.remove('hidden-content');
         blogContent.classList.add('show-content');
+        
         window.scrollTo({ top: 0, behavior: 'smooth' });
     });
     
+    // Cargar los artículos al inicio
     loadBlogArticles(); 
 
     // ===================================================
