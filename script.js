@@ -1,8 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     
     // ===================================================
-    // 1. GESTIÓN DEL PRELOADER (Ajustado para forzar los 3 segundos)
-    // ... (CÓDIGO DE PRELOADER OMITIDO POR BREVEDAD) ...
+    // 1. GESTIÓN DEL PRELOADER (CON PORCENTAJE Y 3 SEGUNDOS)
     // ===================================================
 
     const preloader = document.getElementById('preloader');
@@ -11,12 +10,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const loadingText = document.querySelector('.loading-text');
 
     const MIN_LOAD_TIME = 3000; 
-    const INTERVAL_MS = 50;     
+    const INTERVAL_MS = 30;     
     let isLoaded = false;
     let progress = 0;
 
     const progressInterval = setInterval(() => {
-        if (progress < 90) {
+        if (progress < 100) {
             progress += 1; 
             progressBar.style.width = progress + '%';
             loadingText.textContent = `Cargando... ${Math.floor(progress)}%`;
@@ -29,8 +28,9 @@ document.addEventListener('DOMContentLoaded', () => {
         isLoaded = true;
         clearInterval(progressInterval);
         
+        progress = 100;
         progressBar.style.width = '100%';
-        loadingText.textContent = `Carga completa.`;
+        loadingText.textContent = `Cargando... 100%`;
 
         setTimeout(() => {
             preloader.classList.add('fade-out');
@@ -43,7 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 
             }, { once: true });
             
-        }, 500); 
+        }, 300); 
     };
 
     setTimeout(() => {
@@ -53,7 +53,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ===================================================
     // 2. NAVEGACIÓN Y SIDEBAR
-    // ... (CÓDIGO DE NAVEGACIÓN OMITIDO POR BREVEDAD) ...
     // ===================================================
     
     const sidebar = document.getElementById('sidebar');
@@ -122,12 +121,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const blogGridContainer = document.getElementById('blogGridContainer');
     const blogCardTemplate = document.getElementById('blogCardTemplate');
 
-    // NUEVA FUNCIÓN: Convierte **texto** a <strong>texto</strong>
     const formatArticleContent = (content) => {
-        // Expresión regular para encontrar **texto** y reemplazarlo con <strong>texto</strong>
         return content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
     };
-
 
     const loadBlogArticles = () => {
         if (typeof articles !== 'undefined' && blogGridContainer && blogCardTemplate) {
@@ -140,7 +136,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (!a.isPinned && b.isPinned) return 1;
                 return 0; 
             });
-
 
             sortedArticles.forEach(article => {
                 const clone = blogCardTemplate.content.cloneNode(true);
@@ -171,12 +166,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // Función para mostrar el contenido de un artículo
     const displayArticle = (article) => {
         document.getElementById('article-title').textContent = article.title;
         document.getElementById('article-subtitle').textContent = article.subtitle;
         
-        // USO DE LA NUEVA FUNCIÓN DE FORMATO
         const formattedContent = formatArticleContent(article.content);
         document.getElementById('article-body').innerHTML = formattedContent;
         
@@ -189,7 +182,6 @@ document.addEventListener('DOMContentLoaded', () => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
-    // Botón de regresar del artículo
     backToBlogButton.addEventListener('click', () => {
         articleView.classList.remove('show-content');
         articleView.classList.add('hidden-content');
@@ -200,12 +192,10 @@ document.addEventListener('DOMContentLoaded', () => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     });
     
-    // Cargar los artículos al inicio
     loadBlogArticles(); 
 
     // ===================================================
-    // 4. LÓGICA DE SUGERENCIAS (Requiere Login)
-    // ... (CÓDIGO DE SUGERENCIAS OMITIDO POR BREVEDAD) ...
+    // 4. LÓGICA DE SUGERENCIAS 
     // ===================================================
 
     const suggestionForm = document.getElementById('suggestionForm');
@@ -225,7 +215,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const userEmail = localStorage.getItem('userEmail');
         
-        // --- AQUÍ IRÍA EL FETCH AL SERVIDOR ---
+        // AQUÍ IRÍA EL FETCH AL SERVIDOR
         
         suggestionMessage.textContent = `¡Sugerencia enviada! Gracias, ${userEmail || 'Usuario'}. La revisaremos pronto.`;
         suggestionMessage.style.color = '#2ecc71';
@@ -248,10 +238,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-
     // ===================================================
     // 5. GESTIÓN DE SESIÓN DE GOOGLE
-    // ... (CÓDIGO DE GOOGLE OMITIDO POR BREVEDAD) ...
     // ===================================================
 
     const googleSignInButton = document.getElementById('googleSignInButton');
@@ -330,7 +318,6 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // ===================================================
     // 6. LÓGICA DE COOKIES Y MODAL DE TÉRMINOS
-    // ... (CÓDIGO DE COOKIES OMITIDO POR BREVEDAD) ...
     // ===================================================
 
     const cookieBanner = document.getElementById('cookieBanner');
