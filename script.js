@@ -127,11 +127,14 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // ===================================================
-    // FUNCIÓN AUXILIAR: Convertir **texto** a <strong>texto</strong>
+    // FUNCIÓN AUXILIAR: Convertir markdown a HTML
     // ===================================================
-    const convertMarkdownBold = (text) => {
-        // Reemplaza **texto** con <strong>texto</strong>
-        return text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    const convertMarkdownToHTML = (text) => {
+        // Primero convertir **texto** a <strong>texto</strong> (negrilla)
+        text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        // Luego convertir *texto* a <em>texto</em> (cursiva/itálica)
+        text = text.replace(/\*(.*?)\*/g, '<em>$1</em>');
+        return text;
     };
 
     // ===================================================
@@ -191,9 +194,9 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('article-title').textContent = article.title;
         document.getElementById('article-subtitle').textContent = article.subtitle;
         
-        // CORRECCIÓN: Convertir **texto** a <strong>texto</strong> antes de mostrar
-        const contentWithBold = convertMarkdownBold(article.content);
-        document.getElementById('article-body').innerHTML = contentWithBold;
+        // CORRECCIÓN: Convertir markdown a HTML antes de mostrar
+        const contentWithFormatting = convertMarkdownToHTML(article.content);
+        document.getElementById('article-body').innerHTML = contentWithFormatting;
         
         // Transición: Ocultar Blog y mostrar Artículo (Mutuamente excluyente)
         blogContent.classList.remove('show-content');
