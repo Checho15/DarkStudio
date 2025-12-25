@@ -188,8 +188,24 @@ document.addEventListener('DOMContentLoaded', () => {
                 clone.querySelector('.card-description').textContent = description;
 
                 // Evento de clic para mostrar el artículo completo
-                card.addEventListener('click', () => {
-                    displayArticle(article);
+                card.addEventListener('click', (e) => {
+                    // Evitar que el clic en el bookmark active el artículo
+                    if (!e.target.classList.contains('fa-bookmark')) {
+                        displayArticle(article);
+                    }
+                });
+                
+                // Manejar el botón de favoritos
+                const bookmarkIcon = clone.querySelector('.fa-bookmark');
+                
+                // Verificar si ya está en favoritos
+                if (isArticleFavorited(article.id)) {
+                    bookmarkIcon.classList.add('favorited');
+                }
+                
+                bookmarkIcon.addEventListener('click', (e) => {
+                    e.stopPropagation(); // Evitar que se abra el artículo
+                    toggleFavorite(article.id, bookmarkIcon);
                 });
 
                 blogGridContainer.appendChild(clone);
@@ -321,6 +337,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const dropdownName = document.getElementById('dropdownName');
     const signOutButton = document.getElementById('signOutButton');
     const settingsButton = document.getElementById('settingsButton');
+    const favoritesButton = document.getElementById('favoritesButton');
 
     // Muestra/Oculta el menú desplegable del perfil
     userProfileContainer.addEventListener('click', (e) => {
@@ -344,7 +361,8 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.removeItem('userName');
         localStorage.removeItem('userEmail');
         localStorage.removeItem('userPicture');
-        localStorage.removeItem('userLoadTime'); // Limpiar configuración
+        localStorage.removeItem('userLoadTime'); 
+        localStorage.removeItem('favoriteArticles'); // Limpiar favoritos
 
         updateAuthUI(false);
     });
@@ -352,7 +370,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // Abrir modal de configuración
     settingsButton.addEventListener('click', () => {
         openSettingsModal();
-        dropdownMenu.classList.add('hidden'); // Cerrar dropdown
+        dropdownMenu.classList.add('hidden');
+    });
+    
+    // Abrir modal de favoritos
+    favoritesButton.addEventListener('click', () => {
+        openFavoritesModal();
+        dropdownMenu.classList.add('hidden');
     });
 
 
@@ -404,7 +428,138 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     
     // ===================================================
-    // 6. LÓGICA DE COOKIES Y MODAL DE TÉRMINOS
+    // 6. GESTIÓN DE FAVORITOS
+    // ===================================================
+    
+    // Obtener favoritos del localStorage
+    const getFavorites = () => {
+        const favorites = localStorage.getItem('favoriteArticles');
+        return favorites ? JSON.parse(favorites) : [];
+    };
+    
+    // Guardar favoritos en localStorage
+    const saveFavorites = (favorites) => {
+        localStorage.setItem('favoriteArticles', JSON.stringify(favorites));
+    };
+    
+    // Verificar si un artículo está en favoritos
+    const isArticleFavorited = (articleId) => {
+        const favorites = getFavorites();
+        return favorites.includes(articleId);
+    };
+    
+    // Toggle favorito (agregar/quitar)
+    const toggleFavorite = (articleId, iconElement) => {
+        const userEmail = localStorage.getItem('userEmail');
+        
+        if (!userEmail) {
+            alert('Debes iniciar sesión para guardar artículos favoritos.');
+            return;
+        }
+        
+        let favorites = getFavorites();
+        
+        if (favorites.includes(articleId)) {
+            // Quitar de favoritos
+            favorites = favorites.filter(id => id !== articleId);
+            iconElement.classList.remove('favorited');
+        } else {
+            // Agregar a favoritos
+            favorites.push(articleId);
+            iconElement.classList.add('favorited');
+        }
+        
+        saveFavorites(favorites);
+    };
+    
+    // Abrir modal de favoritos
+    const openFavoritesModal = () => {
+        const favoritesModal = document.getElementById('favoritesModal');
+        const favoritesContainer = document.getElementById('favoritesContainer');
+        const emptyFavorites = document.getElementById('emptyFavorites');
+        
+        favoritesModal.classList.remove('hidden-modal');
+        
+        const favorites = getFavorites();
+        favoritesContainer.innerHTML = '';
+        
+        if (favorites.length === 0) {
+            emptyFavorites.classList.remove('hidden');
+            favoritesContainer.style.display = 'none';
+        } else {
+            emptyFavorites.classList.add('hidden');
+            favoritesContainer.style.display = 'grid';
+            
+            favorites.forEach(articleId => {
+                const article = articles.find(a => a.id === articleId);
+                if (article) {
+                    const card = document.createElement('div');
+                    card.className = 'favorite-card';
+                    card.innerHTML = `
+                        <div class="favorite-card-header">
+                            <h3>${article.icon || ''} ${article.title}</h3>
+                            <button class="remove-favorite" data-article-id="${article.id}">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <p>${article.subtitle}</p>
+                    `;
+                    
+                    // Click en la tarjeta abre el artículo
+                    card.addEventListener('click', (e) => {
+                        if (!e.target.closest('.remove-favorite')) {
+                            displayArticle(article);
+                            closeFavoritesModalFunc();
+                        }
+                    });
+                    
+                    // Botón de eliminar
+                    const removeBtn = card.querySelector('.remove-favorite');
+                    removeBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        removeFavorite(article.id);
+                    });
+                    
+                    favoritesContainer.appendChild(card);
+                }
+            });
+        }
+    };
+    
+    // Cerrar modal de favoritos
+    const closeFavoritesModalFunc = () => {
+        document.getElementById('favoritesModal').classList.add('hidden-modal');
+    };
+    
+    // Remover favorito
+    const removeFavorite = (articleId) => {
+        let favorites = getFavorites();
+        favorites = favorites.filter(id => id !== articleId);
+        saveFavorites(favorites);
+        
+        // Actualizar la vista
+        openFavoritesModal();
+        
+        // Actualizar el ícono en la lista de artículos si está visible
+        const bookmarkIcons = document.querySelectorAll('.fa-bookmark');
+        bookmarkIcons.forEach(icon => {
+            const card = icon.closest('.blog-card');
+            if (card && card.dataset.articleId === articleId) {
+                icon.classList.remove('favorited');
+            }
+        });
+    };
+    
+    // Event listeners para cerrar el modal de favoritos
+    document.getElementById('closeFavoritesModal').addEventListener('click', closeFavoritesModalFunc);
+    document.getElementById('favoritesModal').addEventListener('click', (e) => {
+        if (e.target.id === 'favoritesModal') {
+            closeFavoritesModalFunc();
+        }
+    });
+    
+    // ===================================================
+    // 7. LÓGICA DE COOKIES Y MODAL DE TÉRMINOS
     // ===================================================
 
     const cookieBanner = document.getElementById('cookieBanner');
@@ -470,7 +625,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     
     // ===================================================
-    // 7. MODAL DE CONFIGURACIÓN
+    // 8. MODAL DE CONFIGURACIÓN
     // ===================================================
     
     const settingsModal = document.getElementById('settingsModal');
@@ -523,7 +678,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     
     // ===================================================
-    // 8. INICIALIZACIÓN
+    // 9. INICIALIZACIÓN
     // ===================================================
     
     checkCookiePreference();
