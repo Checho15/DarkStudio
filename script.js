@@ -218,6 +218,54 @@ document.addEventListener('DOMContentLoaded', () => {
     // FUNCIONES PARA GESTIÓN DE ARTÍCULOS GUARDADOS
     // ===================================================
     
+    // Sistema de notificaciones toast
+    const showToast = (title, message, isRemove = false) => {
+        const toastContainer = document.getElementById('toastContainer');
+        
+        const toast = document.createElement('div');
+        toast.className = `toast ${isRemove ? 'toast-remove' : ''}`;
+        
+        const icon = isRemove ? 'fa-bookmark-slash' : 'fa-bookmark';
+        
+        toast.innerHTML = `
+            <i class="fas ${icon} toast-icon"></i>
+            <div class="toast-content">
+                <p class="toast-title">${title}</p>
+                <p class="toast-message">${message}</p>
+            </div>
+            <button class="toast-close" aria-label="Cerrar">×</button>
+        `;
+        
+        toastContainer.appendChild(toast);
+        
+        // Mostrar con animación
+        setTimeout(() => {
+            toast.classList.add('show');
+        }, 10);
+        
+        // Configurar botón de cerrar
+        const closeButton = toast.querySelector('.toast-close');
+        closeButton.addEventListener('click', () => {
+            removeToast(toast);
+        });
+        
+        // Auto-ocultar después de 4 segundos
+        setTimeout(() => {
+            removeToast(toast);
+        }, 4000);
+    };
+    
+    const removeToast = (toast) => {
+        toast.classList.remove('show');
+        toast.classList.add('hide');
+        
+        setTimeout(() => {
+            if (toast.parentNode) {
+                toast.parentNode.removeChild(toast);
+            }
+        }, 400);
+    };
+    
     const getSavedArticles = () => {
         const userEmail = localStorage.getItem('userEmail');
         if (!userEmail) return [];
@@ -242,16 +290,34 @@ document.addEventListener('DOMContentLoaded', () => {
         
         let savedArticles = getSavedArticles();
         
+        // Buscar el título del artículo para mostrarlo en la notificación
+        const article = articles.find(a => a.id === articleId);
+        const articleTitle = article ? article.title : 'Artículo';
+        
         if (savedArticles.includes(articleId)) {
             // Quitar de guardados
             savedArticles = savedArticles.filter(id => id !== articleId);
             iconElement.classList.remove('saved');
             iconElement.title = 'Guardar para después';
+            
+            // Mostrar notificación de eliminación
+            showToast(
+                '📋 Artículo eliminado',
+                `"${articleTitle}" fue removido de tus guardados.`,
+                true
+            );
         } else {
             // Agregar a guardados
             savedArticles.push(articleId);
             iconElement.classList.add('saved');
             iconElement.title = 'Guardado - Clic para quitar';
+            
+            // Mostrar notificación de guardado
+            showToast(
+                '✨ Artículo guardado',
+                `"${articleTitle}" está ahora en tus favoritos.`,
+                false
+            );
         }
         
         setSavedArticles(savedArticles);
