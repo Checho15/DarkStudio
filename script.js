@@ -187,36 +187,130 @@ document.addEventListener('DOMContentLoaded', () => {
                                   : article.description;
                 clone.querySelector('.card-description').textContent = description;
 
-                // Manejar el botón de favoritos ANTES de agregar al DOM
-                const bookmarkIcon = clone.querySelector('.fa-bookmark');
-                
-                // Verificar si ya está en favoritos
-                if (isArticleFavorited(article.id)) {
-                    bookmarkIcon.classList.add('favorited');
-                }
-                
-                // Agregar la tarjeta al contenedor primero
-                blogGridContainer.appendChild(clone);
-                
-                // DESPUÉS de agregar al DOM, buscar los elementos reales
-                const addedCard = blogGridContainer.querySelector(`[data-article-id="${article.id}"]`);
-                const addedBookmark = addedCard.querySelector('.fa-bookmark');
-                
-                // Evento de clic para el bookmark
-                addedBookmark.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    toggleFavorite(article.id, addedBookmark);
-                });
-                
                 // Evento de clic para mostrar el artículo completo
-                addedCard.addEventListener('click', (e) => {
-                    // Evitar que el clic en el bookmark active el artículo
-                    if (!e.target.classList.contains('fa-bookmark')) {
+                card.addEventListener('click', (e) => {
+                    // Evitar que el clic en el botón de guardar active el artículo
+                    if (!e.target.closest('.fa-bookmark')) {
                         displayArticle(article);
                     }
                 });
+
+                // Configurar el botón de guardado
+                const bookmarkIcon = clone.querySelector('.fa-bookmark');
+                const savedArticles = getSavedArticles();
+                
+                if (savedArticles.includes(article.id)) {
+                    bookmarkIcon.classList.add('saved');
+                    bookmarkIcon.title = 'Guardado - Clic para quitar';
+                }
+                
+                bookmarkIcon.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    toggleSaveArticle(article.id, bookmarkIcon);
+                });
+
+                blogGridContainer.appendChild(clone);
             });
         }
+    };
+
+    // ===================================================
+    // FUNCIONES PARA GESTIÓN DE ARTÍCULOS GUARDADOS
+    // ===================================================
+    
+    const getSavedArticles = () => {
+        const userEmail = localStorage.getItem('userEmail');
+        if (!userEmail) return [];
+        
+        const saved = localStorage.getItem(`savedArticles_${userEmail}`);
+        return saved ? JSON.parse(saved) : [];
+    };
+    
+    const setSavedArticles = (articleIds) => {
+        const userEmail = localStorage.getItem('userEmail');
+        if (!userEmail) return;
+        
+        localStorage.setItem(`savedArticles_${userEmail}`, JSON.stringify(articleIds));
+    };
+    
+    const toggleSaveArticle = (articleId, iconElement) => {
+        const userEmail = localStorage.getItem('userEmail');
+        if (!userEmail) {
+            alert('Debes iniciar sesión para guardar artículos');
+            return;
+        }
+        
+        let savedArticles = getSavedArticles();
+        
+        if (savedArticles.includes(articleId)) {
+            // Quitar de guardados
+            savedArticles = savedArticles.filter(id => id !== articleId);
+            iconElement.classList.remove('saved');
+            iconElement.title = 'Guardar para después';
+        } else {
+            // Agregar a guardados
+            savedArticles.push(articleId);
+            iconElement.classList.add('saved');
+            iconElement.title = 'Guardado - Clic para quitar';
+        }
+        
+        setSavedArticles(savedArticles);
+    };
+    
+    const loadSavedArticles = () => {
+        const savedArticlesContainer = document.getElementById('savedArticlesContainer');
+        const noSavedMessage = document.getElementById('noSavedArticles');
+        const savedArticleIds = getSavedArticles();
+        
+        savedArticlesContainer.innerHTML = '';
+        
+        if (savedArticleIds.length === 0) {
+            noSavedMessage.style.display = 'block';
+            return;
+        }
+        
+        noSavedMessage.style.display = 'none';
+        
+        // Filtrar los artículos guardados
+        const savedArticlesData = articles.filter(article => savedArticleIds.includes(article.id));
+        
+        savedArticlesData.forEach(article => {
+            const clone = blogCardTemplate.content.cloneNode(true);
+            const card = clone.querySelector('.blog-card');
+            
+            card.dataset.articleId = article.id;
+            
+            clone.querySelector('.card-title').textContent = article.title;
+            
+            const icon = article.icon || '';
+            clone.querySelector('.card-subtitle').textContent = `${icon} ${article.subtitle}`;
+            
+            const description = article.description.length > 100 
+                              ? article.description.substring(0, 100) + '...'
+                              : article.description;
+            clone.querySelector('.card-description').textContent = description;
+
+            // Evento de clic para mostrar el artículo completo
+            card.addEventListener('click', (e) => {
+                if (!e.target.closest('.fa-bookmark')) {
+                    displayArticle(article);
+                }
+            });
+
+            // Configurar el botón de guardado (siempre estará marcado aquí)
+            const bookmarkIcon = clone.querySelector('.fa-bookmark');
+            bookmarkIcon.classList.add('saved');
+            bookmarkIcon.title = 'Guardado - Clic para quitar';
+            
+            bookmarkIcon.addEventListener('click', (e) => {
+                e.stopPropagation();
+                toggleSaveArticle(article.id, bookmarkIcon);
+                // Recargar la lista después de quitar
+                setTimeout(() => loadSavedArticles(), 100);
+            });
+
+            savedArticlesContainer.appendChild(clone);
+        });
     };
 
     // Función para mostrar el contenido de un artículo
@@ -343,7 +437,64 @@ document.addEventListener('DOMContentLoaded', () => {
     const dropdownName = document.getElementById('dropdownName');
     const signOutButton = document.getElementById('signOutButton');
     const settingsButton = document.getElementById('settingsButton');
-    const favoritesButton = document.getElementById('favoritesButton');
+    const savedArticlesButton = document.getElementById('savedArticlesButton');
+
+    // Muestra/Oculta el menú desplegable del perfil
+    userProfileContainer.addEventListener('click', (e) => {
+        e.stopPropagation(); 
+        dropdownMenu.classList.toggle('hidden');
+    });
+
+    // Cierra el menú cuando se hace clic fuera
+    document.addEventListener('click', (e) => {
+        if (!userProfileContainer.contains(e.target) && !dropdownMenu.contains(e.target)) {
+            dropdownMenu.classList.add('hidden');
+        }
+    });
+
+    // Lógica para cerrar sesión (Google y Local Storage)
+    signOutButton.addEventListener('click', () => {
+        if (typeof google !== 'undefined' && google.accounts.id) {
+            google.accounts.id.disableAutoSelect(); 
+        }
+
+        // Nota: NO borramos savedArticles al cerrar sesión, se mantienen por usuario
+        localStorage.removeItem('userName');
+        localStorage.removeItem('userEmail');
+        localStorage.removeItem('userPicture');
+        localStorage.removeItem('userLoadTime'); // Limpiar configuración
+
+        updateAuthUI(false);
+    });
+    
+    // Abrir modal de configuración
+    settingsButton.addEventListener('click', () => {
+        openSettingsModal();
+        dropdownMenu.classList.add('hidden'); // Cerrar dropdown
+    });
+    
+    // Abrir sección de artículos guardados
+    savedArticlesButton.addEventListener('click', () => {
+        showSection('saved-articles-content');
+        loadSavedArticles();
+        dropdownMenu.classList.add('hidden'); // Cerrar dropdown
+        closeSidebarPanel();
+    });
+
+
+    // Función global llamada por el SDK de Google
+    window.handleCredentialResponse = (response) => {
+        if (response.credential) {
+            const token = response.credential;
+            const payload = JSON.parse(atob(token.split('.')[1]));
+
+            localStorage.setItem('userName', payload.name);
+            localStorage.setItem('userEmail', payload.email);
+            localStorage.setItem('userPicture', payload.picture);
+            
+            updateAuthUI(true, payload.name, payload.picture);
+        }
+    };
 
     // Función para actualizar la Interfaz de Usuario de Autenticación
     const updateAuthUI = (isLoggedIn, name = '', picture = '') => {
@@ -366,20 +517,6 @@ document.addEventListener('DOMContentLoaded', () => {
         updateSuggestionFormState(isLoggedIn);
     };
 
-    // Función global llamada por el SDK de Google
-    window.handleCredentialResponse = (response) => {
-        if (response.credential) {
-            const token = response.credential;
-            const payload = JSON.parse(atob(token.split('.')[1]));
-
-            localStorage.setItem('userName', payload.name);
-            localStorage.setItem('userEmail', payload.email);
-            localStorage.setItem('userPicture', payload.picture);
-            
-            updateAuthUI(true, payload.name, payload.picture);
-        }
-    };
-
     // Verificar el estado de la sesión al cargar la página
     const checkUserSession = () => {
         const userName = localStorage.getItem('userName');
@@ -391,180 +528,9 @@ document.addEventListener('DOMContentLoaded', () => {
             updateAuthUI(false);
         }
     };
-
-    // Muestra/Oculta el menú desplegable del perfil
-    userProfileContainer.addEventListener('click', (e) => {
-        e.stopPropagation(); 
-        dropdownMenu.classList.toggle('hidden');
-    });
-
-    // Cierra el menú cuando se hace clic fuera
-    document.addEventListener('click', (e) => {
-        if (!userProfileContainer.contains(e.target) && !dropdownMenu.contains(e.target)) {
-            dropdownMenu.classList.add('hidden');
-        }
-    });
-
-    // Lógica para cerrar sesión (Google y Local Storage)
-    signOutButton.addEventListener('click', () => {
-        if (typeof google !== 'undefined' && google.accounts.id) {
-            google.accounts.id.disableAutoSelect(); 
-        }
-
-        localStorage.removeItem('userName');
-        localStorage.removeItem('userEmail');
-        localStorage.removeItem('userPicture');
-        localStorage.removeItem('userLoadTime'); 
-        localStorage.removeItem('favoriteArticles'); // Limpiar favoritos
-
-        updateAuthUI(false);
-    });
-    
-    // Abrir modal de configuración
-    settingsButton.addEventListener('click', () => {
-        openSettingsModal();
-        dropdownMenu.classList.add('hidden');
-    });
-    
-    // Abrir modal de favoritos
-    favoritesButton.addEventListener('click', () => {
-        openFavoritesModal();
-        dropdownMenu.classList.add('hidden');
-    });
     
     // ===================================================
-    // 6. GESTIÓN DE FAVORITOS
-    // ===================================================
-    
-    // Obtener favoritos del localStorage
-    const getFavorites = () => {
-        const favorites = localStorage.getItem('favoriteArticles');
-        return favorites ? JSON.parse(favorites) : [];
-    };
-    
-    // Guardar favoritos en localStorage
-    const saveFavorites = (favorites) => {
-        localStorage.setItem('favoriteArticles', JSON.stringify(favorites));
-    };
-    
-    // Verificar si un artículo está en favoritos
-    const isArticleFavorited = (articleId) => {
-        const favorites = getFavorites();
-        return favorites.includes(articleId);
-    };
-    
-    // Toggle favorito (agregar/quitar)
-    const toggleFavorite = (articleId, iconElement) => {
-        const userEmail = localStorage.getItem('userEmail');
-        
-        if (!userEmail) {
-            alert('Debes iniciar sesión para guardar artículos favoritos.');
-            return;
-        }
-        
-        let favorites = getFavorites();
-        
-        if (favorites.includes(articleId)) {
-            // Quitar de favoritos
-            favorites = favorites.filter(id => id !== articleId);
-            iconElement.classList.remove('favorited');
-        } else {
-            // Agregar a favoritos
-            favorites.push(articleId);
-            iconElement.classList.add('favorited');
-        }
-        
-        saveFavorites(favorites);
-    };
-    
-    // Abrir modal de favoritos
-    const openFavoritesModal = () => {
-        const favoritesModal = document.getElementById('favoritesModal');
-        const favoritesContainer = document.getElementById('favoritesContainer');
-        const emptyFavorites = document.getElementById('emptyFavorites');
-        
-        favoritesModal.classList.remove('hidden-modal');
-        
-        const favorites = getFavorites();
-        favoritesContainer.innerHTML = '';
-        
-        if (favorites.length === 0) {
-            emptyFavorites.classList.remove('hidden');
-            favoritesContainer.style.display = 'none';
-        } else {
-            emptyFavorites.classList.add('hidden');
-            favoritesContainer.style.display = 'grid';
-            
-            favorites.forEach(articleId => {
-                const article = articles.find(a => a.id === articleId);
-                if (article) {
-                    const card = document.createElement('div');
-                    card.className = 'favorite-card';
-                    card.innerHTML = `
-                        <div class="favorite-card-header">
-                            <h3>${article.icon || ''} ${article.title}</h3>
-                            <button class="remove-favorite" data-article-id="${article.id}">
-                                <i class="fas fa-times"></i>
-                            </button>
-                        </div>
-                        <p>${article.subtitle}</p>
-                    `;
-                    
-                    // Click en la tarjeta abre el artículo
-                    card.addEventListener('click', (e) => {
-                        if (!e.target.closest('.remove-favorite')) {
-                            displayArticle(article);
-                            closeFavoritesModalFunc();
-                        }
-                    });
-                    
-                    // Botón de eliminar
-                    const removeBtn = card.querySelector('.remove-favorite');
-                    removeBtn.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        removeFavorite(article.id);
-                    });
-                    
-                    favoritesContainer.appendChild(card);
-                }
-            });
-        }
-    };
-    
-    // Cerrar modal de favoritos
-    const closeFavoritesModalFunc = () => {
-        document.getElementById('favoritesModal').classList.add('hidden-modal');
-    };
-    
-    // Remover favorito
-    const removeFavorite = (articleId) => {
-        let favorites = getFavorites();
-        favorites = favorites.filter(id => id !== articleId);
-        saveFavorites(favorites);
-        
-        // Actualizar la vista
-        openFavoritesModal();
-        
-        // Actualizar el ícono en la lista de artículos si está visible
-        const bookmarkIcons = document.querySelectorAll('.fa-bookmark');
-        bookmarkIcons.forEach(icon => {
-            const card = icon.closest('.blog-card');
-            if (card && card.dataset.articleId === articleId) {
-                icon.classList.remove('favorited');
-            }
-        });
-    };
-    
-    // Event listeners para cerrar el modal de favoritos
-    document.getElementById('closeFavoritesModal').addEventListener('click', closeFavoritesModalFunc);
-    document.getElementById('favoritesModal').addEventListener('click', (e) => {
-        if (e.target.id === 'favoritesModal') {
-            closeFavoritesModalFunc();
-        }
-    });
-    
-    // ===================================================
-    // 7. LÓGICA DE COOKIES Y MODAL DE TÉRMINOS
+    // 6. LÓGICA DE COOKIES Y MODAL DE TÉRMINOS
     // ===================================================
 
     const cookieBanner = document.getElementById('cookieBanner');
@@ -630,7 +596,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     
     // ===================================================
-    // 8. MODAL DE CONFIGURACIÓN
+    // 7. MODAL DE CONFIGURACIÓN
     // ===================================================
     
     const settingsModal = document.getElementById('settingsModal');
@@ -683,7 +649,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     
     // ===================================================
-    // 9. INICIALIZACIÓN
+    // 8. INICIALIZACIÓN
     // ===================================================
     
     checkCookiePreference();
