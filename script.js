@@ -9,10 +9,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const progressBar = document.getElementById('progressBar');
     const loadingText = document.querySelector('.loading-text');
 
-    const MIN_LOAD_TIME = 3000; // Mínimo 3 segundos
+    const MIN_LOAD_TIME = 3000; // Mínimo 3 segundos (será configurable)
     const INTERVAL_MS = 50;     // Intervalo de actualización de la barra
     let isLoaded = false;
     let progress = 0;
+    
+    // Obtener tiempo de carga configurado por el usuario (si está logueado)
+    const getUserLoadTime = () => {
+        const savedTime = localStorage.getItem('userLoadTime');
+        return savedTime ? parseInt(savedTime) * 1000 : 3000; // Por defecto 3 segundos
+    };
+    
+    const loadTime = getUserLoadTime();
 
     // Simulación de progreso de carga (hasta el 90%)
     const progressInterval = setInterval(() => {
@@ -50,10 +58,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 500); // 0.5s de pausa final
     };
 
-    // Forzar el tiempo mínimo de 3 segundos
+    // Forzar el tiempo configurado por el usuario
     setTimeout(() => {
         finishLoading();
-    }, MIN_LOAD_TIME);
+    }, loadTime);
 
 
     // ===================================================
@@ -312,6 +320,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const dropdownMenu = document.getElementById('dropdownMenu');
     const dropdownName = document.getElementById('dropdownName');
     const signOutButton = document.getElementById('signOutButton');
+    const settingsButton = document.getElementById('settingsButton');
 
     // Muestra/Oculta el menú desplegable del perfil
     userProfileContainer.addEventListener('click', (e) => {
@@ -335,8 +344,15 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.removeItem('userName');
         localStorage.removeItem('userEmail');
         localStorage.removeItem('userPicture');
+        localStorage.removeItem('userLoadTime'); // Limpiar configuración
 
         updateAuthUI(false);
+    });
+    
+    // Abrir modal de configuración
+    settingsButton.addEventListener('click', () => {
+        openSettingsModal();
+        dropdownMenu.classList.add('hidden'); // Cerrar dropdown
     });
 
 
@@ -454,7 +470,60 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     
     // ===================================================
-    // 7. INICIALIZACIÓN
+    // 7. MODAL DE CONFIGURACIÓN
+    // ===================================================
+    
+    const settingsModal = document.getElementById('settingsModal');
+    const closeSettingsModal = document.getElementById('closeSettingsModal');
+    const loadTimeSlider = document.getElementById('loadTimeSlider');
+    const loadTimeValue = document.getElementById('loadTimeValue');
+    const saveSettings = document.getElementById('saveSettings');
+    
+    const openSettingsModal = () => {
+        settingsModal.classList.remove('hidden-modal');
+        
+        // Cargar el valor guardado
+        const savedTime = localStorage.getItem('userLoadTime') || '3';
+        loadTimeSlider.value = savedTime;
+        loadTimeValue.textContent = savedTime;
+    };
+    
+    const closeSettingsModalFunc = () => {
+        settingsModal.classList.add('hidden-modal');
+    };
+    
+    // Actualizar valor mostrado al mover el slider
+    loadTimeSlider.addEventListener('input', (e) => {
+        loadTimeValue.textContent = e.target.value;
+    });
+    
+    // Guardar configuración
+    saveSettings.addEventListener('click', () => {
+        const selectedTime = loadTimeSlider.value;
+        localStorage.setItem('userLoadTime', selectedTime);
+        
+        // Mostrar mensaje de éxito
+        const originalText = saveSettings.innerHTML;
+        saveSettings.innerHTML = '<i class="fas fa-check"></i> ¡Guardado!';
+        saveSettings.style.backgroundColor = '#2ecc71';
+        
+        setTimeout(() => {
+            saveSettings.innerHTML = originalText;
+            saveSettings.style.backgroundColor = '#ffffff';
+            closeSettingsModalFunc();
+        }, 1500);
+    });
+    
+    closeSettingsModal.addEventListener('click', closeSettingsModalFunc);
+    
+    settingsModal.addEventListener('click', (e) => {
+        if (e.target === settingsModal) {
+            closeSettingsModalFunc();
+        }
+    });
+    
+    // ===================================================
+    // 8. INICIALIZACIÓN
     // ===================================================
     
     checkCookiePreference();
