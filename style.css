@@ -860,6 +860,18 @@ body {
     border-radius: 4px;
 }
 
+.dropdown-item.settings-item {
+    color: #3498db;
+    border-bottom: 1px solid #333;
+    margin-bottom: 5px;
+    padding-bottom: 10px;
+}
+
+.dropdown-item.settings-item:hover {
+    color: #FFF;
+    background-color: #2980b9;
+}
+
 .dropdown-item i {
     margin-right: 10px;
 }
@@ -887,4 +899,134 @@ body {
     margin: 0;
     font-weight: bold;
     font-size: 1em;
+}
+
+/* ==================================================================== */
+/* === ESTILOS DEL MODAL DE CONFIGURACIÓN === */
+/* ==================================================================== */
+
+.settings-modal-content {
+    max-width: 600px;
+    max-height: 85vh;
+}
+
+.settings-modal-content h1 {
+    font-size: 1.8em;
+    margin-bottom: 30px;
+}
+
+.settings-section {
+    padding: 20px 0;
+    border-bottom: 1px solid #333;
+    margin-bottom: 20px;
+}
+
+.settings-section h3 {
+    color: #FFF;
+    font-size: 1.3em;
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+.settings-description {
+    color: #AAA;
+    font-size: 0.95em;
+    margin-bottom: 25px;
+}
+
+.slider-container {
+    margin: 20px 0;
+}
+
+.slider-container label {
+    display: block;
+    color: #FFF;
+    font-size: 1.1em;
+    margin-bottom: 15px;
+    font-weight: bold;
+}
+
+#loadTimeValue {
+    color: #3498db;
+}
+
+.load-time-slider {
+    width: 100%;
+    height: 8px;
+    background: #333;
+    outline: none;
+    border-radius: 5px;
+    -webkit-appearance: none;
+    appearance: none;
+    cursor: pointer;
+}
+
+.load-time-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    background: #3498db;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.load-time-slider::-webkit-slider-thumb:hover {
+    background: #2980b9;
+}
+
+.load-time-slider::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    background: #3498db;
+    border-radius: 50%;
+    cursor: pointer;
+    border: none;
+    transition: background 0.2s;
+}
+
+.load-time-slider::-moz-range-thumb:hover {
+    background: #2980b9;
+}
+
+.slider-markers {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 5px;
+    padding: 0 5px;
+}
+
+.slider-markers span {
+    color: #666;
+    font-size: 0.85em;
+}
+
+.settings-note {
+    background-color: #1a1a1a;
+    border-left: 3px solid #3498db;
+    padding: 10px 15px;
+    margin-top: 20px;
+    color: #AAA;
+    font-size: 0.9em;
+    border-radius: 4px;
+}
+
+.settings-note i {
+    color: #3498db;
+    margin-right: 8px;
+}
+
+.settings-footer {
+    text-align: center;
+    padding-top: 15px;
+}
+
+.settings-footer button {
+    padding: 12px 30px;
+    font-size: 1.05em;
+}
+
+.settings-footer button i {
+    margin-right: 8px;
 }
