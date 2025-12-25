@@ -62,6 +62,9 @@
                     
                     <div id="dropdownMenu" class="dropdown-menu hidden">
                         <p id="dropdownName" class="dropdown-name"></p>
+                        <button id="settingsButton" class="dropdown-item settings-item">
+                            <i class="fas fa-cog"></i> Configuración
+                        </button>
                         <button id="signOutButton" class="dropdown-item">
                             <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
                         </button>
@@ -148,7 +151,8 @@
                                class="suggestion-input"
                                required
                                minlength="10"
-                               disabled> <button type="submit" class="suggestion-button" disabled>Solicitar Artículo</button>
+                               disabled>
+                        <button type="submit" class="suggestion-button" disabled>Solicitar Artículo</button>
                     </form>
                     
                     <p id="suggestionMessage" class="note"></p>
@@ -209,6 +213,48 @@
             <p class="creator-credit">Reconocimiento a Creador de Página: Checho4364</p>
         </footer>
 
+        <!-- MODAL DE CONFIGURACIÓN -->
+        <div id="settingsModal" class="modal hidden-modal">
+            <div class="modal-content settings-modal-content">
+                <span class="close-button" id="closeSettingsModal">&times;</span>
+                
+                <h1>⚙️ Configuración de Perfil</h1>
+                
+                <div class="settings-section">
+                    <h3>🕐 Duración de la Pantalla de Carga</h3>
+                    <p class="settings-description">Ajusta cuánto tiempo quieres que dure la animación de carga al entrar a la página.</p>
+                    
+                    <div class="slider-container">
+                        <label for="loadTimeSlider">Tiempo: <span id="loadTimeValue">3</span> segundos</label>
+                        <input type="range" 
+                               id="loadTimeSlider" 
+                               class="load-time-slider" 
+                               min="1" 
+                               max="5" 
+                               value="3" 
+                               step="1">
+                        <div class="slider-markers">
+                            <span>1s</span>
+                            <span>2s</span>
+                            <span>3s</span>
+                            <span>4s</span>
+                            <span>5s</span>
+                        </div>
+                    </div>
+                    
+                    <p class="settings-note">
+                        <i class="fas fa-info-circle"></i> 
+                        Esta configuración se guardará en tu perfil. Si cierras sesión, volverá al valor predeterminado (3 segundos).
+                    </p>
+                </div>
+                
+                <div class="settings-footer">
+                    <button id="saveSettings" class="cookie-button">
+                        <i class="fas fa-save"></i> Guardar Configuración
+                    </button>
+                </div>
+            </div>
+        </div>
 
         <div id="cookieBanner" class="cookie-banner hidden-cookie">
             <p class="cookie-text">
@@ -265,4 +311,3 @@
     <script src="script.js"></script>
 </body>
 </html>
-
