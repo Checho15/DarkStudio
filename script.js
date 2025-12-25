@@ -187,15 +187,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                   : article.description;
                 clone.querySelector('.card-description').textContent = description;
 
-                // Evento de clic para mostrar el artículo completo
-                card.addEventListener('click', (e) => {
-                    // Evitar que el clic en el bookmark active el artículo
-                    if (!e.target.classList.contains('fa-bookmark')) {
-                        displayArticle(article);
-                    }
-                });
-                
-                // Manejar el botón de favoritos
+                // Manejar el botón de favoritos ANTES de agregar al DOM
                 const bookmarkIcon = clone.querySelector('.fa-bookmark');
                 
                 // Verificar si ya está en favoritos
@@ -203,12 +195,26 @@ document.addEventListener('DOMContentLoaded', () => {
                     bookmarkIcon.classList.add('favorited');
                 }
                 
-                bookmarkIcon.addEventListener('click', (e) => {
-                    e.stopPropagation(); // Evitar que se abra el artículo
-                    toggleFavorite(article.id, bookmarkIcon);
-                });
-
+                // Agregar la tarjeta al contenedor primero
                 blogGridContainer.appendChild(clone);
+                
+                // DESPUÉS de agregar al DOM, buscar los elementos reales
+                const addedCard = blogGridContainer.querySelector(`[data-article-id="${article.id}"]`);
+                const addedBookmark = addedCard.querySelector('.fa-bookmark');
+                
+                // Evento de clic para el bookmark
+                addedBookmark.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    toggleFavorite(article.id, addedBookmark);
+                });
+                
+                // Evento de clic para mostrar el artículo completo
+                addedCard.addEventListener('click', (e) => {
+                    // Evitar que el clic en el bookmark active el artículo
+                    if (!e.target.classList.contains('fa-bookmark')) {
+                        displayArticle(article);
+                    }
+                });
             });
         }
     };
@@ -339,6 +345,53 @@ document.addEventListener('DOMContentLoaded', () => {
     const settingsButton = document.getElementById('settingsButton');
     const favoritesButton = document.getElementById('favoritesButton');
 
+    // Función para actualizar la Interfaz de Usuario de Autenticación
+    const updateAuthUI = (isLoggedIn, name = '', picture = '') => {
+        if (isLoggedIn) {
+            googleSignInButton.style.display = 'none';
+            userProfileContainer.classList.remove('hidden-profile');
+            
+            name = name || localStorage.getItem('userName');
+            picture = picture || localStorage.getItem('userPicture');
+            
+            profileImage.src = picture;
+            dropdownName.textContent = name;
+        } else {
+            googleSignInButton.style.display = 'block';
+            userProfileContainer.classList.add('hidden-profile');
+            
+            dropdownMenu.classList.add('hidden');
+        }
+        
+        updateSuggestionFormState(isLoggedIn);
+    };
+
+    // Función global llamada por el SDK de Google
+    window.handleCredentialResponse = (response) => {
+        if (response.credential) {
+            const token = response.credential;
+            const payload = JSON.parse(atob(token.split('.')[1]));
+
+            localStorage.setItem('userName', payload.name);
+            localStorage.setItem('userEmail', payload.email);
+            localStorage.setItem('userPicture', payload.picture);
+            
+            updateAuthUI(true, payload.name, payload.picture);
+        }
+    };
+
+    // Verificar el estado de la sesión al cargar la página
+    const checkUserSession = () => {
+        const userName = localStorage.getItem('userName');
+        const userPicture = localStorage.getItem('userPicture');
+
+        if (userName && userPicture) {
+            updateAuthUI(true, userName, userPicture);
+        } else {
+            updateAuthUI(false);
+        }
+    };
+
     // Muestra/Oculta el menú desplegable del perfil
     userProfileContainer.addEventListener('click', (e) => {
         e.stopPropagation(); 
@@ -378,54 +431,6 @@ document.addEventListener('DOMContentLoaded', () => {
         openFavoritesModal();
         dropdownMenu.classList.add('hidden');
     });
-
-
-    // Función global llamada por el SDK de Google
-    window.handleCredentialResponse = (response) => {
-        if (response.credential) {
-            const token = response.credential;
-            const payload = JSON.parse(atob(token.split('.')[1]));
-
-            localStorage.setItem('userName', payload.name);
-            localStorage.setItem('userEmail', payload.email);
-            localStorage.setItem('userPicture', payload.picture);
-            
-            updateAuthUI(true, payload.name, payload.picture);
-        }
-    };
-
-    // Función para actualizar la Interfaz de Usuario de Autenticación
-    const updateAuthUI = (isLoggedIn, name = '', picture = '') => {
-        if (isLoggedIn) {
-            googleSignInButton.style.display = 'none';
-            userProfileContainer.classList.remove('hidden-profile');
-            
-            name = name || localStorage.getItem('userName');
-            picture = picture || localStorage.getItem('userPicture');
-            
-            profileImage.src = picture;
-            dropdownName.textContent = name;
-        } else {
-            googleSignInButton.style.display = 'block';
-            userProfileContainer.classList.add('hidden-profile');
-            
-            dropdownMenu.classList.add('hidden');
-        }
-        
-        updateSuggestionFormState(isLoggedIn);
-    };
-
-    // Verificar el estado de la sesión al cargar la página
-    const checkUserSession = () => {
-        const userName = localStorage.getItem('userName');
-        const userPicture = localStorage.getItem('userPicture');
-
-        if (userName && userPicture) {
-            updateAuthUI(true, userName, userPicture);
-        } else {
-            updateAuthUI(false);
-        }
-    };
     
     // ===================================================
     // 6. GESTIÓN DE FAVORITOS
